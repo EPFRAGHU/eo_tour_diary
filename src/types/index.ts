@@ -63,6 +63,7 @@ export interface TourProgramItem {
   officerId: string;
   officerName?: string;
   title: string;
+  purpose?: string;
   month: number;
   year: number;
   startDate: string;
@@ -77,7 +78,8 @@ export interface TourProgramItem {
 export interface InspectionLogItem {
   id: string;
   tourId: string;
-  visitDate: string;
+  date: string;
+  visitDate?: string;
   establishmentCode: string;
   establishmentName: string;
   location: string;
