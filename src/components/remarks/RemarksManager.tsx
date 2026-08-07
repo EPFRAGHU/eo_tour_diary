@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import {
   Pin,
   History,
-  Edit2,
   Trash2,
-  Check,
   Plus,
   MessageSquare,
-  Tag,
   UserCheck
 } from 'lucide-react';
 import { RichTextRemarksEditor, RemarkItem, RemarkColorLabel } from './RichTextRemarksEditor';

@@ -5,7 +5,6 @@ import {
   Underline,
   List,
   AtSign,
-  Zap,
   Tag,
   Send,
   Pin
