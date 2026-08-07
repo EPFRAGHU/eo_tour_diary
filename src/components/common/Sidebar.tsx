@@ -7,6 +7,7 @@ import {
   FileSpreadsheet,
   Building2,
   FolderOpen,
+  PhoneCall,
   Settings,
   ChevronRight
 } from 'lucide-react';
@@ -24,6 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'inspections', label: 'Inspection Logs', icon: FileCheck2, badge: null },
     { id: 'establishments', label: 'Establishments', icon: Building2, badge: 'Master' },
     { id: 'documents', label: 'Document Vault', icon: FolderOpen, badge: 'v1.2' },
+    { id: 'communication', label: 'Employer Communication', icon: PhoneCall, badge: 'Calls' },
     { id: 'claims', label: 'TA / DA Claims', icon: Receipt, badge: '3 Pending' },
     { id: 'reports', label: 'Monthly Reports', icon: FileSpreadsheet, badge: null },
   ];

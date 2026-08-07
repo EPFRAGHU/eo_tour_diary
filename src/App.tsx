@@ -5,6 +5,7 @@ import { TourPrograms } from '@/pages/TourPrograms';
 import { InspectionLogs } from '@/pages/InspectionLogs';
 import { Establishments } from '@/pages/Establishments';
 import { DocumentVault } from '@/pages/DocumentVault';
+import { CommunicationHub } from '@/pages/CommunicationHub';
 import { Claims } from '@/pages/Claims';
 import { Reports } from '@/pages/Reports';
 import { TourProgramItem, InspectionLogItem, ClaimItem, EstablishmentDTO } from '@/types';
@@ -228,6 +229,9 @@ export function App() {
       )}
       {activeTab === 'documents' && (
         <DocumentVault establishments={establishments} />
+      )}
+      {activeTab === 'communication' && (
+        <CommunicationHub establishments={establishments} />
       )}
       {activeTab === 'claims' && (
         <Claims claims={claims} tours={tours} onAddClaim={handleAddClaim} />
