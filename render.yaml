@@ -1,0 +1,26 @@
+# Render.com Infrastructure Blueprint Specification
+# EPFO EO Tour Diary - Production Web App & Database Services
+
+services:
+  # Web Application Service (Static Site with SPA Routing)
+  - type: web
+    name: eo-tour-diary
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: VITE_APP_TITLE
+        value: "EPFO EO Tour Diary & Field Inspection Portal"
+
+databases:
+  # Managed PostgreSQL Database Service
+  - name: eo-tour-diary-db
+    databaseName: epfo_tour_diary
+    user: epfo_admin
+    plan: free
