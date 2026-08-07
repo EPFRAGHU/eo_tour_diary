@@ -14,6 +14,22 @@ export interface AuditLogEntry {
 
 const AUDIT_LOG_KEY = 'epfo_security_audit_logs';
 const RATE_LIMIT_STORE: Record<string, number[]> = {};
+const memoryAuditStore: Record<string, string> = {};
+
+const getAuditItem = (key: string): string | null => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    return localStorage.getItem(key);
+  }
+  return memoryAuditStore[key] || null;
+};
+
+const setAuditItem = (key: string, value: string): void => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    localStorage.setItem(key, value);
+  } else {
+    memoryAuditStore[key] = value;
+  }
+};
 
 /**
  * Sanitizes input strings against XSS script injection attacks.
@@ -122,7 +138,7 @@ export const logAuditAction = (
       status,
     };
     const updated = [entry, ...existing.slice(0, 99)]; // Keep latest 100 logs
-    localStorage.setItem(AUDIT_LOG_KEY, JSON.stringify(updated));
+    setAuditItem(AUDIT_LOG_KEY, JSON.stringify(updated));
   } catch (e) {
     console.error('Failed to log security audit action:', e);
   }
@@ -133,7 +149,7 @@ export const logAuditAction = (
  */
 export const getAuditLogs = (): AuditLogEntry[] => {
   try {
-    const raw = localStorage.getItem(AUDIT_LOG_KEY);
+    const raw = getAuditItem(AUDIT_LOG_KEY);
     if (!raw) {
       // Return sample baseline logs
       return [

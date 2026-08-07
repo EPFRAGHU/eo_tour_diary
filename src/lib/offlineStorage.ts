@@ -8,6 +8,24 @@ export interface OfflineDraftItem {
   data: any;
 }
 
+// In-memory fallback for non-browser Node environments
+const memoryStorage: Record<string, string> = {};
+
+const getItem = (key: string): string | null => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    return localStorage.getItem(key);
+  }
+  return memoryStorage[key] || null;
+};
+
+const setItem = (key: string, value: string): void => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    localStorage.setItem(key, value);
+  } else {
+    memoryStorage[key] = value;
+  }
+};
+
 /**
  * Custom hook to monitor real-time online/offline network connectivity.
  */
@@ -20,12 +38,16 @@ export const useNetworkStatus = () => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+    }
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      }
     };
   }, []);
 
@@ -43,7 +65,7 @@ export const saveOfflineDraft = (id: string, data: any): void => {
       { id, savedAt: new Date().toISOString(), data },
       ...filtered,
     ];
-    localStorage.setItem(OFFLINE_DRAFTS_KEY, JSON.stringify(updated));
+    setItem(OFFLINE_DRAFTS_KEY, JSON.stringify(updated));
   } catch (e) {
     console.error('Failed to save offline draft:', e);
   }
@@ -54,7 +76,7 @@ export const saveOfflineDraft = (id: string, data: any): void => {
  */
 export const getOfflineDrafts = (): OfflineDraftItem[] => {
   try {
-    const raw = localStorage.getItem(OFFLINE_DRAFTS_KEY);
+    const raw = getItem(OFFLINE_DRAFTS_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -68,7 +90,7 @@ export const clearOfflineDraft = (id: string): void => {
   try {
     const existing = getOfflineDrafts();
     const updated = existing.filter((d) => d.id !== id);
-    localStorage.setItem(OFFLINE_DRAFTS_KEY, JSON.stringify(updated));
+    setItem(OFFLINE_DRAFTS_KEY, JSON.stringify(updated));
   } catch (e) {
     console.error('Failed to clear offline draft:', e);
   }
