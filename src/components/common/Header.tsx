@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Shield, Bell, Search, UserCheck, LogOut, ShieldCheck } from 'lucide-react';
+import { Shield, Bell, Search, UserCheck, LogOut, ShieldCheck, Crown } from 'lucide-react';
 import { UserProfile } from '@/types';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '@/providers/AuthProvider';
 import { NotificationCenterModal } from '@/components/notifications/NotificationCenterModal';
 import { AuditLogViewerModal } from '@/components/security/AuditLogViewerModal';
 import { getDefaultOfficeName } from '@/lib/officeConfig';
+import { isProtectedSuperAdmin } from '@/lib/securityUtils';
 
 interface HeaderProps {
   user: UserProfile;
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab, onNavigate }) =
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const defaultOffice = getDefaultOfficeName();
+  const isSuperAdmin = isProtectedSuperAdmin(user);
 
   return (
     <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border px-4 lg:px-8 py-3 transition-colors">
@@ -34,6 +36,16 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab, onNavigate }) =
               <span className="text-[10px] bg-epfo-navy/10 dark:bg-epfo-navy/40 text-epfo-navy dark:text-epfo-slate px-2 py-0.5 rounded-full font-bold">
                 {user.officeRegion || defaultOffice}
               </span>
+              {isSuperAdmin && (
+                <button
+                  onClick={() => onNavigate?.('admin')}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 font-extrabold text-[10px] border border-amber-500/30 hover:bg-amber-500 hover:text-white transition-all shadow-sm"
+                  title="Super Admin has master control over all data throughout the portal"
+                >
+                  <Crown className="w-3 h-3 text-amber-500" />
+                  <span>Master Admin Active</span>
+                </button>
+              )}
             </div>
             <h1 className="text-base font-bold capitalize text-foreground tracking-tight">
               {activeTab === 'dashboard' && 'Officer Dashboard'}

@@ -14,7 +14,10 @@ import {
   Zap,
   Building,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  Crown,
+  Database,
+  FileSpreadsheet
 } from 'lucide-react';
 import {
   UserProfile,
@@ -30,6 +33,8 @@ import {
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { QuickActionModal } from '@/components/dashboard/QuickActionModal';
 import { getDefaultOfficeName } from '@/lib/officeConfig';
+import { isProtectedSuperAdmin } from '@/lib/securityUtils';
+import { exportTourDiaryToExcel } from '@/lib/excelExport';
 
 interface DashboardProps {
   user: UserProfile;
@@ -41,7 +46,9 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({
   user,
-  inspections,
+  tours = [],
+  inspections = [],
+  claims = [],
   onNavigate,
 }) => {
   const [modalType, setModalType] = useState<'RECOVERY' | 'CALL' | 'DOCUMENT' | null>(null);
@@ -312,6 +319,93 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-epfo-accent/20 rounded-full blur-2xl pointer-events-none"></div>
       </div>
+
+      {/* Super Admin Master Control Center (Full Data Master Panel) */}
+      {isProtectedSuperAdmin(user) && (
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-card to-card border-2 border-amber-500/40 shadow-lg space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-amber-500 text-white shadow-md">
+                <Crown className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-black tracking-tight text-foreground">Super Admin Master Data Control Center</h3>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-extrabold text-[10px] border border-emerald-500/30">
+                    UNRESTRICTED ACCESS
+                  </span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Logged in as <strong className="text-foreground">{user.email}</strong> • Master control over all tours, inspections, claims, establishments & users.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  const masterState = {
+                    exportedAt: new Date().toISOString(),
+                    superAdmin: user.name,
+                    office: getDefaultOfficeName(),
+                    inspections,
+                    tours,
+                    claims,
+                    documents,
+                    recovery,
+                  };
+                  const blob = new Blob([JSON.stringify(masterState, null, 2)], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `EPFO_Master_Database_Backup_${new Date().toISOString().split('T')[0]}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="px-3 py-1.5 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold shadow-sm transition-all flex items-center gap-1.5"
+                title="Download complete system JSON snapshot"
+              >
+                <Database className="w-3.5 h-3.5 text-blue-500" />
+                <span>Master DB Backup</span>
+              </button>
+
+              <button
+                onClick={() => exportTourDiaryToExcel({ tour: tours[0], month: 8, year: 2026, user })}
+                className="px-3 py-1.5 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold shadow-sm transition-all flex items-center gap-1.5"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Export Master .xls</span>
+              </button>
+
+              <button
+                onClick={() => onNavigate('admin')}
+                className="px-3 py-1.5 rounded-xl bg-epfo-navy hover:bg-epfo-blue text-white text-xs font-bold shadow-sm transition-all"
+              >
+                Admin Console
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
+              <span className="text-[10px] uppercase font-bold text-muted-foreground block">System Default Office</span>
+              <span className="font-extrabold text-foreground">{getDefaultOfficeName()}</span>
+            </div>
+            <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
+              <span className="text-[10px] uppercase font-bold text-muted-foreground block">Establishments Covered</span>
+              <span className="font-extrabold text-emerald-600 dark:text-emerald-400">100% Odisha Zone (`OR/BBS/`)</span>
+            </div>
+            <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
+              <span className="text-[10px] uppercase font-bold text-muted-foreground block">Total Inspections Logged</span>
+              <span className="font-extrabold text-foreground">{inspections.length} Field Audits</span>
+            </div>
+            <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
+              <span className="text-[10px] uppercase font-bold text-muted-foreground block">Claims Processed</span>
+              <span className="font-extrabold text-foreground">{claims.length} Submitted Bills</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Primary Metrics Grid (Cards 1-4) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
