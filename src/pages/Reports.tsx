@@ -133,7 +133,7 @@ export const Reports: React.FC<ReportsProps> = ({
                 <tbody className="divide-y divide-border/60">
                   {inspections.map((i) => (
                     <tr key={i.id} className="hover:bg-muted/20">
-                      <td className="py-2.5 px-3 font-mono text-[11px]">{formatDate(i.date)}</td>
+                      <td className="py-2.5 px-3 font-mono text-[11px]">{formatDate(i.date || i.visitDate || new Date())}</td>
                       <td className="py-2.5 px-3 font-mono font-bold text-epfo-navy dark:text-epfo-slate">
                         {i.establishmentCode}
                       </td>

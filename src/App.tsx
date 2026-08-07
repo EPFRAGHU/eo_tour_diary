@@ -4,6 +4,7 @@ import { Dashboard } from '@/pages/Dashboard';
 import { TourPrograms } from '@/pages/TourPrograms';
 import { InspectionLogs } from '@/pages/InspectionLogs';
 import { Establishments } from '@/pages/Establishments';
+import { DocumentVault } from '@/pages/DocumentVault';
 import { Claims } from '@/pages/Claims';
 import { Reports } from '@/pages/Reports';
 import { TourProgramItem, InspectionLogItem, ClaimItem, EstablishmentDTO } from '@/types';
@@ -224,6 +225,9 @@ export function App() {
           onDeleteEstablishment={handleDeleteEstablishment}
           onImportEstablishments={handleImportEstablishments}
         />
+      )}
+      {activeTab === 'documents' && (
+        <DocumentVault establishments={establishments} />
       )}
       {activeTab === 'claims' && (
         <Claims claims={claims} tours={tours} onAddClaim={handleAddClaim} />

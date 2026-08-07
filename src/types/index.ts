@@ -1,105 +1,101 @@
-import {
-  UserRole,
-  CoverageStatus,
-  TourStatus,
-  InspectionStatus,
-  ClaimStatus,
-  DayType
-} from '@prisma/client';
+export type UserRole = 'ADMIN' | 'APFC' | 'EO' | 'EO_AO' | 'VIEWER';
 
-export {
-  UserRole,
-  CoverageStatus,
-  TourStatus,
-  InspectionStatus,
-  ClaimStatus,
-  DayType
-};
+export type TourStatus =
+  | 'DRAFT'
+  | 'SUBMITTED'
+  | 'RECOMMENDED_APFC'
+  | 'APPROVED_RPFC'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED';
 
-export interface RegionalOfficeDTO {
+export type InspectionStatus =
+  | 'SCHEDULED'
+  | 'CONDUCTED'
+  | 'DEFERRED'
+  | 'NON_COMPLIANT_FOUND'
+  | 'REPORT_SUBMITTED';
+
+export type ClaimStatus =
+  | 'DRAFT'
+  | 'SUBMITTED'
+  | 'VERIFIED_APFC'
+  | 'APPROVED_RPFC'
+  | 'REJECTED'
+  | 'DISBURSED';
+
+export type CoverageStatus =
+  | 'COVERED'
+  | 'UNCOVERED'
+  | 'EXEMPTED'
+  | 'CLUSTER_HANDLOOM'
+  | 'GOVT_UNDERTAKING';
+
+export type DayType =
+  | 'OFFICE_DAY'
+  | 'TOUR_DAY'
+  | 'WEEKEND_SATURDAY'
+  | 'WEEKEND_SUNDAY'
+  | 'PUBLIC_HOLIDAY'
+  | 'SPECIAL_CAMP';
+
+export interface UserProfile {
   id: string;
-  officeCode: string;
-  officeName: string;
-  district: string;
-  state: string;
+  name: string;
+  email: string;
+  designation: string;
+  officeRegion: string;
+  role: UserRole;
+  pfStaffId?: string;
+  avatarUrl?: string;
 }
 
 export interface EstablishmentDTO {
   id: string;
   establishmentCode: string;
   name: string;
+  establishmentName?: string;
   location: string;
   district: string;
   coverageStatus: CoverageStatus;
-  industryType?: string | null;
-}
-
-export interface VisitPurposeDTO {
-  id: string;
-  code: string;
-  name: string;
-  category: string;
-}
-
-export interface ConveyanceModeDTO {
-  id: string;
-  code: string;
-  name: string;
-  ratePerKm: number;
-}
-
-export interface UserProfile {
-  id: string;
-  pfStaffId?: string | null;
-  name: string;
-  email: string;
-  designation: string;
-  officeRegion: string;
-  role: UserRole;
-}
-
-export interface TourProgramItem {
-  id: string;
-  officerId: string;
-  officerName?: string;
-  title: string;
-  purpose?: string;
-  month: number;
-  year: number;
-  startDate: string;
-  endDate: string;
-  status: TourStatus;
-  officeOrderRef?: string | null;
-  remarks?: string | null;
-  inspectionsCount?: number;
-  createdAt: string;
+  industryType?: string;
 }
 
 export interface InspectionLogItem {
   id: string;
   tourId: string;
-  date: string;
+  date?: string;
   visitDate?: string;
   establishmentCode: string;
   establishmentName: string;
   location: string;
   inspectionPurpose: string;
-  workDoneDetails?: string;
   observations: string;
+  status: InspectionStatus;
   distanceKm?: number;
   conveyanceMode?: string;
-  vehicleDetails?: string;
-  orderRef?: string | null;
-  hotelStayed?: boolean;
-  hotelName?: string | null;
-  hotelAmount?: number;
-  status: InspectionStatus;
+}
+
+export interface TourProgramItem {
+  id: string;
+  officerId: string;
+  title: string;
+  purpose: string;
+  month: number;
+  year: number;
+  startDate: string;
+  endDate: string;
+  status: TourStatus;
+  remarks?: string;
+  inspectionsCount?: number;
+  createdAt: string;
 }
 
 export interface ClaimItem {
   id: string;
   tourId: string;
-  tourTitle?: string;
+  tourTitle: string;
   officerId: string;
   totalAmount: number;
   taAmount: number;
@@ -107,29 +103,46 @@ export interface ClaimItem {
   hotelAmount: number;
   otherAmount: number;
   status: ClaimStatus;
-  remarks?: string | null;
+  remarks?: string;
   createdAt: string;
 }
 
-// Additional Dashboard Specific Data Structures
 export interface FollowUpItem {
   id: string;
   establishmentCode: string;
   establishmentName: string;
   dueDate: string;
-  type: '7A_ENQUIRY' | '14B_DAMAGES' | 'FORM_11_NOTICE' | 'COMPLIANCE_REMINDER';
+  type: 'FORM_11_NOTICE' | '7A_ENQUIRY' | '14B_DAMAGES' | 'COVERAGE_CHECK' | 'PMVBRY_CAMP';
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
-  status: 'PENDING' | 'RESOLVED';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
   description: string;
 }
+
+export interface DocumentVersionItem {
+  version: string;
+  uploadedAt: string;
+  uploadedBy: string;
+  fileName: string;
+  fileSize: string;
+  changeNotes?: string;
+}
+
+export type FileFormatType = 'PHOTO' | 'PDF' | 'WORD' | 'EXCEL' | 'ZIP';
 
 export interface DocumentRecord {
   id: string;
   title: string;
-  category: 'INSPECTION_NOTE' | 'OFFICE_ORDER' | 'CLAIM_RECEIPT' | 'LEGAL_NOTICE';
+  category: 'INSPECTION_NOTE' | 'NOTICE_7A' | 'DAMAGES_14B' | 'TA_RECEIPT' | 'OFFICE_ORDER' | 'GENERAL';
   refNumber: string;
   uploadedAt: string;
   fileSize: string;
+  establishmentCode: string;
+  establishmentName: string;
+  folderPath: string;
+  fileFormat: FileFormatType;
+  fileUrl?: string;
+  currentVersion: string;
+  versions: DocumentVersionItem[];
 }
 
 export interface CallLogItem {
@@ -156,6 +169,6 @@ export interface ActivityFeedItem {
   timestamp: string;
   title: string;
   description: string;
-  category: 'TOUR' | 'INSPECTION' | 'CLAIM' | 'RECOVERY' | 'DOCUMENT';
+  category: 'INSPECTION' | 'CLAIM' | 'TOUR' | 'RECOVERY' | 'DOCUMENT';
   badgeColor?: string;
 }

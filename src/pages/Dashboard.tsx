@@ -104,6 +104,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
       refNumber: 'OR/DO/CTC/Compliance/810/2026',
       uploadedAt: '2026-08-05',
       fileSize: '1.8 MB',
+      establishmentCode: 'MH/BAN/0045231/000',
+      establishmentName: 'Apex Logistics & Freight India Pvt Ltd',
+      folderPath: '/MH-BAN-0045231-000/Inspection Reports/',
+      fileFormat: 'PDF',
+      currentVersion: 'v1.2',
+      versions: [
+        {
+          version: 'v1.2',
+          uploadedAt: '2026-08-05',
+          uploadedBy: 'Rajesh Sharma (EO/AO)',
+          fileName: 'Apex_Logistics_Report.pdf',
+          fileSize: '1.8 MB',
+        },
+      ],
     },
     {
       id: 'd-2',
@@ -112,11 +126,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
       refNumber: 'OR/BBS/ADMIN-I/NAN 2.0/457/2023',
       uploadedAt: '2026-08-01',
       fileSize: '420 KB',
+      establishmentCode: 'GENERAL',
+      establishmentName: 'General Directives',
+      folderPath: '/GENERAL/Office Directives/',
+      fileFormat: 'PDF',
+      currentVersion: 'v1.0',
+      versions: [
+        {
+          version: 'v1.0',
+          uploadedAt: '2026-08-01',
+          uploadedBy: 'APFC',
+          fileName: 'Office_Directive.pdf',
+          fileSize: '420 KB',
+        },
+      ],
     },
   ]);
 
   // Widget 6: Calls Log State
-  const [callLogs, setCallLogs] = useState<CallLogItem[]>([
+  const [callLogs] = useState<CallLogItem[]>([
     {
       id: 'c-1',
       contactName: 'Mr. Anil Das',
@@ -184,20 +212,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
         },
         ...prev,
       ]);
-    } else if (type === 'CALL') {
-      setCallLogs((prev) => [
-        {
-          id: `c-${Date.now()}`,
-          contactName: data.name,
-          establishmentName: data.name,
-          designation: 'Contact Manager',
-          phoneNumber: data.phone || '+91 99000 00000',
-          callDate: data.date,
-          purpose: 'Official Compliance Follow-up',
-          notes: data.notes || 'Discussed compliance status and ECR returns.',
-        },
-        ...prev,
-      ]);
     } else if (type === 'DOCUMENT') {
       setDocuments((prev) => [
         {
@@ -207,6 +221,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
           refNumber: data.code || `REF-${Date.now()}`,
           uploadedAt: new Date().toISOString().split('T')[0],
           fileSize: '1.2 MB',
+          establishmentCode: 'OR/6276',
+          establishmentName: data.name,
+          folderPath: '/OR-6276/Inspection Reports/',
+          fileFormat: 'PDF',
+          currentVersion: 'v1.0',
+          versions: [
+            {
+              version: 'v1.0',
+              uploadedAt: new Date().toISOString().split('T')[0],
+              uploadedBy: 'Rajesh Sharma (EO/AO)',
+              fileName: `${data.name}.pdf`,
+              fileSize: '1.2 MB',
+            },
+          ],
         },
         ...prev,
       ]);
