@@ -400,7 +400,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
         <div className="p-8 rounded-2xl bg-card border border-border space-y-4">
           <h3 className="text-sm font-bold text-epfo-navy dark:text-epfo-accent">EPFO Jurisdiction Districts & Zones</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-            {['Khordha / BBS', 'Cuttack', 'Berhampur', 'Rourkela', 'Jajpur (Industrial)', 'Angul', 'Sambalpur', 'Mumbai Bandra East'].map((dist) => (
+            {['Khordha / Bhubaneswar', 'Cuttack', 'Berhampur (Ganjam)', 'Rourkela (Sundargarh)', 'Jajpur (Industrial)', 'Angul', 'Sambalpur', 'Balasore / Mayurbhanj'].map((dist) => (
               <div key={dist} className="p-3.5 rounded-xl border border-border bg-muted/20 font-semibold flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-emerald-500" />
                 <span>{dist}</span>

@@ -8,7 +8,7 @@ export const Register: React.FC = () => {
     name: '',
     email: '',
     designation: 'Enforcement Officer (EO/AO)',
-    officeRegion: 'RO Bhubaneswar / RO Mumbai (Bandra)',
+    officeRegion: 'EPFO, DO, Cuttack / RO Bhubaneswar',
     password: '',
   });
 
@@ -67,7 +67,7 @@ export const Register: React.FC = () => {
               <input
                 type="text"
                 required
-                placeholder="RO Bhubaneswar / RO Mumbai (Bandra)"
+                placeholder="EPFO, DO, Cuttack / RO Bhubaneswar"
                 value={formData.officeRegion}
                 onChange={(e) => setFormData({ ...formData, officeRegion: e.target.value })}
                 className="w-full pl-9 pr-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"

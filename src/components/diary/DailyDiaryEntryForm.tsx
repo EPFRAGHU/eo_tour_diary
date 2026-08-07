@@ -68,7 +68,7 @@ export const DailyDiaryEntryForm: React.FC<DailyDiaryEntryFormProps> = ({
       alert(`GPS Check-in successful! Captured: ${gpsStr}`);
     } catch (err: any) {
       alert(`GPS check-in notice: Could not fetch automatic location (${err.message}). Defaulting to region GPS.`);
-      handleChange('gpsCoords', 'Lat: 19.0760, Long: 72.8777 (Mumbai Region)');
+      handleChange('gpsCoords', 'Lat: 20.4625, Long: 85.8828 (Cuttack, Odisha)');
     } finally {
       setIsGPSLoading(false);
     }

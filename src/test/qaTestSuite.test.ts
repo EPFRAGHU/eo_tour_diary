@@ -26,8 +26,8 @@ export const runAllQATests = (): { passed: number; failed: number; total: number
   logs.push('---------------------------------------------------------');
 
   // Test 1.1: GPS Distance Math (Haversine formula)
-  const distance = calculateDistanceKm(19.0760, 72.8777, 19.1197, 72.9051); // Mumbai to MIDC Andheri
-  assert(distance > 0 && distance < 10, 'GPS Haversine distance calculation (approx 5.6 Km)');
+  const distance = calculateDistanceKm(20.4625, 85.8828, 20.2961, 85.8245); // Cuttack to Bhubaneswar
+  assert(distance > 15 && distance < 30, 'GPS Haversine distance calculation (approx 21.4 Km Cuttack-BBS)');
 
   // Test 1.2: Currency Formatter
   const formattedMoney = formatCurrency(345000);

@@ -293,7 +293,8 @@ export const UserTable: React.FC<UserTableProps> = ({
               <option value="Regional Office Bhubaneswar">RO Bhubaneswar</option>
               <option value="District Office Cuttack">DO Cuttack</option>
               <option value="Regional Office Rourkela">RO Rourkela</option>
-              <option value="Headquarters New Delhi">HQ New Delhi</option>
+              <option value="District Office Berhampur">DO Berhampur</option>
+              <option value="District Office Sambalpur">DO Sambalpur</option>
             </select>
           </div>
         </div>

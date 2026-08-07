@@ -515,12 +515,13 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, office: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-input bg-background focus:ring-2 focus:ring-epfo-navy outline-none"
                 >
+                  <option value={getDefaultOfficeName()}>{getDefaultOfficeName()}</option>
                   <option value="Regional Office Bhubaneswar">Regional Office Bhubaneswar</option>
                   <option value="District Office Cuttack">District Office Cuttack</option>
                   <option value="District Office Berhampur">District Office Berhampur</option>
                   <option value="Regional Office Rourkela">Regional Office Rourkela</option>
-                  <option value="Regional Office Mumbai (Bandra)">Regional Office Mumbai (Bandra)</option>
-                  <option value="Headquarters New Delhi">Headquarters New Delhi</option>
+                  <option value="District Office Sambalpur">District Office Sambalpur</option>
+                  <option value="District Office Balasore">District Office Balasore</option>
                 </select>
               </div>
 

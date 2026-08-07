@@ -18,7 +18,7 @@ export const Login: React.FC = () => {
         name: 'Shri Raghunatha Maharana',
         email: 'raghunatha.maharana@epfindia.gov.in',
         designation: 'Enforcement Officer (EO/AO)',
-        officeRegion: 'RO Bhubaneswar / RO Mumbai (Bandra)',
+        officeRegion: 'EPFO, DO, Cuttack / RO Bhubaneswar',
         role: 'EO',
       },
       EO_AO: {
@@ -27,7 +27,7 @@ export const Login: React.FC = () => {
         name: 'Shri Raghunatha Maharana',
         email: 'raghunatha.maharana@epfindia.gov.in',
         designation: 'Enforcement Officer (EO/AO)',
-        officeRegion: 'RO Bhubaneswar / RO Mumbai (Bandra)',
+        officeRegion: 'EPFO, DO, Cuttack / RO Bhubaneswar',
         role: 'EO',
       },
       APFC: {
@@ -36,7 +36,7 @@ export const Login: React.FC = () => {
         name: 'Smt. Anita Roy',
         email: 'anita.roy@epfindia.gov.in',
         designation: 'Assistant PF Commissioner (Compliance)',
-        officeRegion: 'RO Mumbai (Bandra)',
+        officeRegion: 'EPFO Regional Office, Bhubaneswar',
         role: 'APFC',
       },
       ADMIN: {
@@ -45,7 +45,7 @@ export const Login: React.FC = () => {
         name: 'System Administrator',
         email: 'admin.portal@epfindia.gov.in',
         designation: 'Portal Administrator',
-        officeRegion: 'Headquarters, New Delhi',
+        officeRegion: 'EPFO Regional Office, Bhubaneswar',
         role: 'ADMIN',
       },
       VIEWER: {
@@ -54,7 +54,7 @@ export const Login: React.FC = () => {
         name: 'Auditor Inspection Viewer',
         email: 'auditor.view@epfindia.gov.in',
         designation: 'Audit & Vigilance Inspector',
-        officeRegion: 'RO Mumbai (Bandra)',
+        officeRegion: 'EPFO Regional Office, Rourkela',
         role: 'VIEWER',
       },
     };
