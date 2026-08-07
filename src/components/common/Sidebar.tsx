@@ -21,6 +21,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
     { id: 'tours', label: 'Tour Schedule', icon: CalendarDays, badge: 'Active' },
     { id: 'inspections', label: 'Inspection Logs', icon: FileCheck2, badge: null },
+    { id: 'establishments', label: 'Establishments', icon: Building2, badge: 'Master' },
     { id: 'claims', label: 'TA / DA Claims', icon: Receipt, badge: '3 Pending' },
     { id: 'reports', label: 'Monthly Reports', icon: FileSpreadsheet, badge: null },
   ];
