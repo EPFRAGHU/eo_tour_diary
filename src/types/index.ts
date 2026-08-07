@@ -110,3 +110,52 @@ export interface ClaimItem {
   remarks?: string | null;
   createdAt: string;
 }
+
+// Additional Dashboard Specific Data Structures
+export interface FollowUpItem {
+  id: string;
+  establishmentCode: string;
+  establishmentName: string;
+  dueDate: string;
+  type: '7A_ENQUIRY' | '14B_DAMAGES' | 'FORM_11_NOTICE' | 'COMPLIANCE_REMINDER';
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  status: 'PENDING' | 'RESOLVED';
+  description: string;
+}
+
+export interface DocumentRecord {
+  id: string;
+  title: string;
+  category: 'INSPECTION_NOTE' | 'OFFICE_ORDER' | 'CLAIM_RECEIPT' | 'LEGAL_NOTICE';
+  refNumber: string;
+  uploadedAt: string;
+  fileSize: string;
+}
+
+export interface CallLogItem {
+  id: string;
+  contactName: string;
+  establishmentName: string;
+  designation: string;
+  phoneNumber: string;
+  callDate: string;
+  purpose: string;
+  notes: string;
+}
+
+export interface RecoveryMetric {
+  targetAmount: number;
+  recoveredAmount: number;
+  pendingAmount: number;
+  section7aAmount: number;
+  section14bAmount: number;
+}
+
+export interface ActivityFeedItem {
+  id: string;
+  timestamp: string;
+  title: string;
+  description: string;
+  category: 'TOUR' | 'INSPECTION' | 'CLAIM' | 'RECOVERY' | 'DOCUMENT';
+  badgeColor?: string;
+}
