@@ -8,6 +8,7 @@ import {
   Building2,
   FolderOpen,
   PhoneCall,
+  AlertTriangle,
   Settings,
   ChevronRight
 } from 'lucide-react';
@@ -23,6 +24,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
     { id: 'tours', label: 'Tour Schedule', icon: CalendarDays, badge: 'Active' },
     { id: 'inspections', label: 'Inspection Logs', icon: FileCheck2, badge: null },
+    { id: 'followups', label: 'Pending Follow-ups', icon: AlertTriangle, badge: '4 Pending' },
     { id: 'establishments', label: 'Establishments', icon: Building2, badge: 'Master' },
     { id: 'documents', label: 'Document Vault', icon: FolderOpen, badge: 'v1.2' },
     { id: 'communication', label: 'Employer Communication', icon: PhoneCall, badge: 'Calls' },

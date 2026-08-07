@@ -32,6 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab }) => {
               {activeTab === 'dashboard' && 'Officer Dashboard'}
               {activeTab === 'tours' && 'Tour Program Schedule'}
               {activeTab === 'inspections' && 'Field Inspection Logs'}
+              {activeTab === 'followups' && 'Pending Compliance Follow-ups'}
               {activeTab === 'establishments' && 'Establishments Registry'}
               {activeTab === 'documents' && 'Digital Document Vault'}
               {activeTab === 'communication' && 'Employer Communication & Call Liaison'}

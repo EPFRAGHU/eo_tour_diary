@@ -6,6 +6,7 @@ import { InspectionLogs } from '@/pages/InspectionLogs';
 import { Establishments } from '@/pages/Establishments';
 import { DocumentVault } from '@/pages/DocumentVault';
 import { CommunicationHub } from '@/pages/CommunicationHub';
+import { FollowUpTracker } from '@/pages/FollowUpTracker';
 import { Claims } from '@/pages/Claims';
 import { Reports } from '@/pages/Reports';
 import { TourProgramItem, InspectionLogItem, ClaimItem, EstablishmentDTO } from '@/types';
@@ -216,6 +217,9 @@ export function App() {
           tours={tours}
           onAddInspection={handleAddInspection}
         />
+      )}
+      {activeTab === 'followups' && (
+        <FollowUpTracker establishments={establishments} onNavigate={setActiveTab} />
       )}
       {activeTab === 'establishments' && (
         <Establishments

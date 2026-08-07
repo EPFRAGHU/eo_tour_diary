@@ -112,10 +112,12 @@ export interface FollowUpItem {
   establishmentCode: string;
   establishmentName: string;
   dueDate: string;
+  nextVisitDate?: string;
   type: 'FORM_11_NOTICE' | '7A_ENQUIRY' | '14B_DAMAGES' | 'COVERAGE_CHECK' | 'PMVBRY_CAMP';
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'OVERDUE';
   description: string;
+  createdAt?: string;
 }
 
 export interface DocumentVersionItem {
