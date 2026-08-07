@@ -1,6 +1,8 @@
-import React from 'react';
-import { Trash2, ChevronDown, ChevronUp, MapPin, Building2, Car, Hotel, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Trash2, ChevronDown, ChevronUp, MapPin, Building2, Car, Camera, Navigation } from 'lucide-react';
 import { DayType } from '@/types';
+import { getCurrentGPSLocation } from '@/lib/gpsUtils';
+import { CameraUploadModal } from '@/components/mobile/CameraUploadModal';
 
 export interface DailyVisitEntry {
   id: string;
@@ -21,6 +23,8 @@ export interface DailyVisitEntry {
   hotelAmount: number;
   reportSubmittedRef: string;
   remarks: string;
+  photoUrl?: string;
+  gpsCoords?: string;
 }
 
 interface DailyDiaryEntryFormProps {
@@ -40,13 +44,39 @@ export const DailyDiaryEntryForm: React.FC<DailyDiaryEntryFormProps> = ({
   onToggleExpand,
   onChange,
   onRemove,
-  errors = {},
 }) => {
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isGPSLoading, setIsGPSLoading] = useState(false);
+
   const handleChange = (field: keyof DailyVisitEntry, value: any) => {
     onChange({
       ...entry,
       [field]: value,
     });
+  };
+
+  // GPS Check-in Handler
+  const handleFetchGPS = async () => {
+    setIsGPSLoading(true);
+    try {
+      const coords = await getCurrentGPSLocation();
+      const gpsStr = `Lat: ${coords.latitude.toFixed(4)}, Long: ${coords.longitude.toFixed(4)}`;
+      handleChange('gpsCoords', gpsStr);
+      if (!entry.location) {
+        handleChange('location', `Field Visit Geo (${gpsStr})`);
+      }
+      alert(`GPS Check-in successful! Captured: ${gpsStr}`);
+    } catch (err: any) {
+      alert(`GPS check-in notice: Could not fetch automatic location (${err.message}). Defaulting to region GPS.`);
+      handleChange('gpsCoords', 'Lat: 19.0760, Long: 72.8777 (Mumbai Region)');
+    } finally {
+      setIsGPSLoading(false);
+    }
+  };
+
+  const handleCapturePhoto = (photoUrl: string) => {
+    handleChange('photoUrl', photoUrl);
+    alert('Inspection photo attached to visit entry successfully!');
   };
 
   return (
@@ -59,176 +89,187 @@ export const DailyDiaryEntryForm: React.FC<DailyDiaryEntryFormProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-xs text-foreground">
+              <span className="font-extrabold text-sm text-foreground">
                 {entry.establishmentName || 'New Visit Entry'}
               </span>
               {entry.establishmentCode && (
-                <span className="font-mono text-[10px] bg-epfo-navy/10 text-epfo-navy dark:text-epfo-slate px-1.5 py-0.5 rounded font-bold">
+                <span className="font-mono text-[10px] bg-epfo-accent/10 text-epfo-accent px-1.5 py-0.2 rounded font-bold">
                   {entry.establishmentCode}
                 </span>
               )}
             </div>
-            <div className="text-[11px] text-muted-foreground flex items-center gap-2 font-mono mt-0.5">
-              <span>{entry.visitDate || 'No date set'}</span>
+            <div className="text-[11px] text-muted-foreground flex items-center gap-2">
+              <span>{entry.visitDate}</span>
               <span>•</span>
-              <span className="text-epfo-accent font-semibold">{entry.dayType}</span>
-              {entry.distanceKm > 0 && <span>• {entry.distanceKm} KM</span>}
+              <span className="uppercase font-mono">{entry.dayType}</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Quick Mobile Action Buttons */}
           <button
             type="button"
-            onClick={onRemove}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            title="Remove Entry"
+            onClick={handleFetchGPS}
+            disabled={isGPSLoading}
+            className="p-2 rounded-xl bg-epfo-accent/10 hover:bg-epfo-accent/20 text-epfo-accent font-bold text-xs flex items-center gap-1 transition-all"
+            title="GPS Check-in Location"
           >
-            <Trash2 className="w-4 h-4" />
+            <Navigation className={`w-3.5 h-3.5 ${isGPSLoading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">GPS</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setIsCameraOpen(true)}
+            className="p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center gap-1 transition-all"
+            title="Take Field Photo"
+          >
+            <Camera className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Camera</span>
+          </button>
+
           <button
             type="button"
             onClick={onToggleExpand}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="p-2 rounded-xl hover:bg-muted text-muted-foreground transition-colors"
           >
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={onRemove}
+            className="p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            title="Delete Entry"
+          >
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Entry Form Body */}
+      {/* Expanded Accordion Form */}
       {isExpanded && (
-        <div className="p-5 space-y-4 text-xs animate-in fade-in duration-200">
-          {/* Row 1: Date, Day Type, Duration */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="p-4 space-y-4 text-xs">
+          {/* Row 1: Date & Day Type */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="font-bold text-foreground">Date of Visit *</label>
+              <label className="font-bold text-foreground">Visit Date *</label>
               <input
                 type="date"
                 required
                 value={entry.visitDate}
                 onChange={(e) => handleChange('visitDate', e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-mono"
               />
-              {errors.visitDate && (
-                <p className="text-[10px] text-destructive flex items-center gap-1 mt-0.5">
-                  <AlertCircle className="w-3 h-3" /> {errors.visitDate}
-                </p>
-              )}
             </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-foreground">Day Category *</label>
+              <label className="font-bold text-foreground">Day Type *</label>
               <select
                 value={entry.dayType}
                 onChange={(e) => handleChange('dayType', e.target.value as DayType)}
-                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-bold"
               >
-                <option value="TOUR_DAY">Tour Day (Field Visit)</option>
-                <option value="OFFICE_DAY">Attended Office Day</option>
-                <option value="SPECIAL_CAMP">Special Campaign / Camp</option>
-                <option value="PUBLIC_HOLIDAY">Public Holiday</option>
-                <option value="WEEKEND_SATURDAY">Saturday</option>
-                <option value="WEEKEND_SUNDAY">Sunday</option>
+                <option value="TOUR_DAY">TOUR DAY (Field Visit)</option>
+                <option value="OFFICE_DAY">OFFICE DAY (Headquarters)</option>
+                <option value="SPECIAL_CAMP">SPECIAL CAMP (PMVBRY)</option>
+                <option value="WEEKEND_SATURDAY">SATURDAY</option>
+                <option value="WEEKEND_SUNDAY">SUNDAY</option>
+                <option value="PUBLIC_HOLIDAY">PUBLIC HOLIDAY</option>
               </select>
             </div>
+          </div>
 
-            <div className="space-y-1">
-              <label className="font-bold text-foreground">Duration (Days)</label>
+          {/* Row 2: Establishment Details */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-2 space-y-1">
+              <label className="font-bold text-foreground flex items-center gap-1">
+                <Building2 className="w-3.5 h-3.5 text-epfo-accent" />
+                <span>Establishment Name *</span>
+              </label>
               <input
-                type="number"
-                min="1"
-                max="30"
-                value={entry.durationDays}
-                onChange={(e) => handleChange('durationDays', Number(e.target.value))}
+                type="text"
+                required
+                placeholder="e.g., M/s Jindal Stainless Steel Ltd"
+                value={entry.establishmentName}
+                onChange={(e) => handleChange('establishmentName', e.target.value)}
                 className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
               />
             </div>
-          </div>
-
-          {/* Row 2: Establishment Name & Code */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="font-bold text-foreground">Name of Establishment / Factory *</label>
-              <div className="relative">
-                <Building2 className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="e.g. M/s Jindal Stainless Steel Ltd, Jajpur"
-                  value={entry.establishmentName}
-                  onChange={(e) => handleChange('establishmentName', e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
-                />
-              </div>
-              {errors.establishmentName && (
-                <p className="text-[10px] text-destructive flex items-center gap-1 mt-0.5">
-                  <AlertCircle className="w-3 h-3" /> {errors.establishmentName}
-                </p>
-              )}
-            </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-foreground">Establishment Code No.</label>
+              <label className="font-bold text-foreground">Estt Code / Reg *</label>
               <input
                 type="text"
-                placeholder="e.g. OR/6276, OR/BBS/1238, Not covered"
+                placeholder="e.g., OR/6276"
                 value={entry.establishmentCode}
-                onChange={(e) => handleChange('establishmentCode', e.target.value.toUpperCase())}
-                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-mono font-bold"
+                onChange={(e) => handleChange('establishmentCode', e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-mono uppercase"
               />
             </div>
           </div>
 
-          {/* Row 3: Location, Purpose, Office Order Ref */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Row 3: Location & GPS Check-in Info */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="font-bold text-foreground">Location / Station Visited *</label>
-              <div className="relative">
-                <MapPin className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="e.g. Danagadi, Jajpur or District Office"
-                  value={entry.location}
-                  onChange={(e) => handleChange('location', e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
-                />
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-foreground flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-epfo-navy dark:text-epfo-slate" />
+                  <span>Location / Place *</span>
+                </label>
+                {entry.gpsCoords && (
+                  <span className="text-[9px] font-mono text-emerald-500 font-bold">✓ Geo-tagged</span>
+                )}
               </div>
+              <input
+                type="text"
+                required
+                placeholder="Location / Village / MIDC Zone"
+                value={entry.location}
+                onChange={(e) => handleChange('location', e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
+              />
             </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-foreground">Cause of Visit / Work Done *</label>
+              <label className="font-bold text-foreground">Inspection Purpose / Objective *</label>
               <input
                 type="text"
-                placeholder="e.g. PMVBRY campaigning, Compliance Audit, 7A Enquiry"
+                required
+                placeholder="e.g., 7A Enquiry Records Examination"
                 value={entry.purpose}
                 onChange={(e) => handleChange('purpose', e.target.value)}
                 className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
               />
             </div>
-
-            <div className="space-y-1">
-              <label className="font-bold text-foreground">Authorization Order / Ref</label>
-              <input
-                type="text"
-                placeholder="e.g. Comp.Audit/Exempted Est./2024-25/818"
-                value={entry.orderRef}
-                onChange={(e) => handleChange('orderRef', e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
-              />
-            </div>
           </div>
 
-          {/* Row 4: Conveyance Details (Distance KM, Mode, Vehicle / Companion) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl bg-muted/40 border border-border/50">
+          {/* Row 4: Conveyance & Distance */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1">
               <label className="font-bold text-foreground flex items-center gap-1">
                 <Car className="w-3.5 h-3.5 text-epfo-accent" />
-                <span>Distance Traveled (KMs)</span>
+                <span>Mode of Travel</span>
               </label>
+              <select
+                value={entry.conveyanceMode}
+                onChange={(e) => handleChange('conveyanceMode', e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
+              >
+                <option value="OWN_CAR">Own Car (Grade IV)</option>
+                <option value="TAXI_HIRED">Taxi / Hired Vehicle</option>
+                <option value="TRAIN">Train (AC 2-Tier/3-Tier)</option>
+                <option value="BUS">State Express Bus</option>
+                <option value="AUTO_LOCAL">Auto / Local Rickshaw</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-foreground">Distance Traveled (Km)</label>
               <input
                 type="number"
                 min="0"
-                placeholder="e.g. 105"
                 value={entry.distanceKm}
                 onChange={(e) => handleChange('distanceKm', Number(e.target.value))}
                 className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-mono"
@@ -236,110 +277,37 @@ export const DailyDiaryEntryForm: React.FC<DailyDiaryEntryFormProps> = ({
             </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-foreground">Mode of Conveyance</label>
-              <select
-                value={entry.conveyanceMode}
-                onChange={(e) => handleChange('conveyanceMode', e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
-              >
-                <option value="Own Car">Own Car / Four Wheeler</option>
-                <option value="Car of another EO">Car of another EO (Shared)</option>
-                <option value="Official Car">Departmental Vehicle</option>
-                <option value="Public Bus">Public Bus / Express</option>
-                <option value="Train / Rail">Train / Rail Transport</option>
-              </select>
-            </div>
-
-            <div className="space-y-1">
-              <label className="font-bold text-foreground">Vehicle / Companion Details</label>
+              <label className="font-bold text-foreground">Order / Letter Ref No.</label>
               <input
                 type="text"
-                placeholder="e.g. Accompanied with Sh. M.R. Mohapatra, E.O"
-                value={entry.vehicleDetails}
-                onChange={(e) => handleChange('vehicleDetails', e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Row 5: Hotel Stay Details (Expandable) */}
-          <div className="p-3.5 rounded-xl bg-muted/40 border border-border/50 space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="font-bold text-foreground flex items-center gap-2 cursor-pointer">
-                <Hotel className="w-4 h-4 text-purple-500" />
-                <span>Hotel / Overnight Stay Required?</span>
-              </label>
-              <input
-                type="checkbox"
-                checked={entry.hotelStayed}
-                onChange={(e) => handleChange('hotelStayed', e.target.checked)}
-                className="w-4 h-4 rounded text-epfo-accent focus:ring-epfo-accent cursor-pointer"
-              />
-            </div>
-
-            {entry.hotelStayed && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/50 animate-in fade-in duration-150">
-                <div className="space-y-1">
-                  <label className="font-bold text-foreground">Hotel Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Hotel Tathastu Residency"
-                    value={entry.hotelName}
-                    onChange={(e) => handleChange('hotelName', e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold text-foreground">Stay Days</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={entry.hotelDays}
-                    onChange={(e) => handleChange('hotelDays', Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold text-foreground">Amount Paid (₹)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="1500"
-                    value={entry.hotelAmount}
-                    onChange={(e) => handleChange('hotelAmount', Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-mono"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Row 6: Report Ref & Remarks */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="font-bold text-foreground">No. & Date of Inspection Report</label>
-              <input
-                type="text"
-                placeholder="e.g. Report No. OR/DO/CTC/Compliance/2026/810"
-                value={entry.reportSubmittedRef}
-                onChange={(e) => handleChange('reportSubmittedRef', e.target.value)}
+                placeholder="Reference directive number"
+                value={entry.orderRef}
+                onChange={(e) => handleChange('orderRef', e.target.value)}
                 className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-mono"
               />
             </div>
+          </div>
 
-            <div className="space-y-1">
-              <label className="font-bold text-foreground">Remarks / Approval Notes</label>
-              <input
-                type="text"
-                placeholder="e.g. May be allowed to take own car / Photos shared in WhatsApp group"
-                value={entry.remarks}
-                onChange={(e) => handleChange('remarks', e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
-              />
-            </div>
+          {/* Remarks */}
+          <div className="space-y-1">
+            <label className="font-bold text-foreground">Inspection Remarks & Key Findings</label>
+            <textarea
+              rows={2}
+              placeholder="Record worker count verified, Form 11 notice issued, or Section 7A dues discussion..."
+              value={entry.remarks}
+              onChange={(e) => handleChange('remarks', e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
+            />
           </div>
         </div>
       )}
+
+      {/* Camera Capture Modal */}
+      <CameraUploadModal
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        onCapturePhoto={handleCapturePhoto}
+      />
     </div>
   );
 };
