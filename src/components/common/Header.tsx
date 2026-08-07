@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Shield, Bell, Search, UserCheck, LogOut } from 'lucide-react';
 import { UserProfile } from '@/types';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '@/providers/AuthProvider';
+import { NotificationCenterModal } from '@/components/notifications/NotificationCenterModal';
 
 interface HeaderProps {
   user: UserProfile;
   activeTab: string;
+  onNavigate?: (tab: string) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, activeTab }) => {
+export const Header: React.FC<HeaderProps> = ({ user, activeTab, onNavigate }) => {
   const { logout } = useAuth();
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border px-4 lg:px-8 py-3 transition-colors">
@@ -55,13 +58,14 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab }) => {
             <kbd className="ml-4 font-mono text-[10px] bg-background border rounded px-1.5 py-0.5 text-muted-foreground">⌘K</kbd>
           </div>
 
-          {/* Notifications */}
+          {/* Notifications Trigger Bell */}
           <button
-            aria-label="Notifications"
+            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+            aria-label="Open Notification Center"
             className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-epfo-accent"></span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-epfo-accent animate-pulse"></span>
           </button>
 
           {/* Officer Profile Badge */}
@@ -93,6 +97,13 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab }) => {
           </div>
         </div>
       </div>
+
+      {/* Notification Center Popover Modal */}
+      <NotificationCenterModal
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+        onNavigate={onNavigate}
+      />
     </header>
   );
 };
