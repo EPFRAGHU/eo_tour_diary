@@ -1,4 +1,5 @@
-// Prisma Schema for EPFO EO Tour Diary
+// Production Prisma Schema for EPFO EO Tour Diary System
+// Derived from official EPFO Field Inspection & Tour Diary registers
 
 generator client {
   provider = "prisma-client-js"
@@ -9,120 +10,241 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  EO_AO
-  APFC
-  RPFC
-  ADMIN
+// ==========================================
+// ENUMS & CONSTANTS
+// ==========================================
+
+enum UserRole {
+  EO_AO       // Enforcement Officer / Accounts Officer
+  APFC        // Assistant Provident Fund Commissioner
+  RPFC_II     // Regional Provident Fund Commissioner II
+  RPFC_I      // Regional Provident Fund Commissioner I
+  ADMIN       // System Administrator
+}
+
+enum CoverageStatus {
+  COVERED
+  UNCOVERED
+  EXEMPTED
+  CLUSTER_HANDLOOM
+  GOVT_UNDERTAKING
+  NOT_APPLICABLE
 }
 
 enum TourStatus {
   DRAFT
   SUBMITTED
-  APPROVED
+  RECOMMENDED_APFC
+  APPROVED_RPFC
   REJECTED
   IN_PROGRESS
   COMPLETED
 }
 
 enum InspectionStatus {
-  PENDING
+  SCHEDULED
   CONDUCTED
   DEFERRED
   NON_COMPLIANT_FOUND
+  REPORT_SUBMITTED
 }
 
 enum ClaimStatus {
   DRAFT
   SUBMITTED
-  VERIFIED_BY_APFC
-  APPROVED_BY_RPFC
+  VERIFIED_APFC
+  APPROVED_RPFC
   REJECTED
   DISBURSED
 }
 
+enum DayType {
+  OFFICE_DAY
+  TOUR_DAY
+  WEEKEND_SATURDAY
+  WEEKEND_SUNDAY
+  PUBLIC_HOLIDAY
+  SPECIAL_CAMP
+}
+
+// ==========================================
+// MASTER / LOOKUP TABLES
+// ==========================================
+
+model RegionalOffice {
+  id         String   @id @default(uuid())
+  officeCode String   @unique // e.g. "CTC", "BBS", "BAN"
+  officeName String   // e.g. "District Office, Cuttack", "Regional Office, Bhubaneswar"
+  district   String
+  state      String   @default("Odisha")
+  users      User[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("regional_offices")
+}
+
+model Establishment {
+  id                String            @id @default(uuid())
+  establishmentCode String            @unique // e.g. "OR/6276", "OR/BBS/1238"
+  name              String
+  location          String
+  district          String
+  coverageStatus    CoverageStatus    @default(COVERED)
+  industryType      String?
+  inspections       InspectionVisit[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([establishmentCode])
+  @@index([district])
+  @@map("establishments")
+}
+
+model VisitPurposeMaster {
+  id          String            @id @default(uuid())
+  code        String            @unique // e.g. "COMPLIANCE_AUDIT", "PMVBRY", "7A_ENQUIRY"
+  name        String            // Description of purpose
+  category    String            // "COMPLIANCE", "ENQUIRY", "CAMPAIGN", "OFFICE"
+  visits      InspectionVisit[]
+  createdAt   DateTime          @default(now())
+
+  @@map("visit_purpose_masters")
+}
+
+model ConveyanceModeMaster {
+  id          String            @id @default(uuid())
+  code        String            @unique // e.g. "OWN_CAR", "SHARED_EO_CAR", "PUBLIC_TRANSPORT"
+  name        String
+  ratePerKm   Float             @default(0)
+  visits      InspectionVisit[]
+  createdAt   DateTime          @default(now())
+
+  @@map("conveyance_mode_masters")
+}
+
+// ==========================================
+// CORE ENTITIES & RELATIONS
+// ==========================================
+
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  name         String
-  designation  String
-  officeRegion String
-  role         Role          @default(EO_AO)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  tours        TourProgram[]
-  claims       Claim[]
+  id             String          @id @default(uuid())
+  pfStaffId      String?         @unique // Official PF Employee ID
+  email          String          @unique
+  name           String          // e.g. "Sri S.N. Behera"
+  designation    String          // e.g. "Enforcement Officer (EO/AO)"
+  role           UserRole        @default(EO_AO)
+  officeId       String?
+  office         RegionalOffice? @relation(fields: [officeId], references: [id], onDelete: SetNull)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  tours          TourProgram[]   @relation("OfficerTours")
+  approvedTours  TourProgram[]   @relation("ApproverTours")
+  inspections    InspectionVisit[]
+  claims         TaDaClaim[]
 
   @@map("users")
 }
 
 model TourProgram {
-  id           String          @id @default(uuid())
-  officerId    String
-  officer      User            @relation(fields: [officerId], references: [id], onDelete: Cascade)
-  title        String
-  purpose      String
-  month        Int
-  year         Int
-  startDate    DateTime
-  endDate      DateTime
-  status       TourStatus      @default(DRAFT)
-  remarks      String?
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  logs         InspectionLog[]
-  claims       Claim[]
+  id             String            @id @default(uuid())
+  officerId      String
+  officer        User              @relation("OfficerTours", fields: [officerId], references: [id], onDelete: Cascade)
+  month          Int               // 1-12
+  year           Int               // e.g. 2025, 2026
+  title          String            // e.g. "Monthly Tour Diary - November 2025"
+  officeOrderRef String?           // e.g. "Office order No.OR/BBS/ADMIN-I/NAN 2.0/457/2023"
+  status         TourStatus        @default(DRAFT)
+  remarks        String?
+  submittedAt    DateTime?
+  approverId     String?
+  approver       User?             @relation("ApproverTours", fields: [approverId], references: [id], onDelete: SetNull)
+  approvedAt     DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  inspections    InspectionVisit[]
+  claims         TaDaClaim[]
 
+  @@index([officerId, month, year])
+  @@index([status])
   @@map("tour_programs")
 }
 
-model InspectionLog {
-  id                String           @id @default(uuid())
-  tourId            String
-  tour              TourProgram      @relation(fields: [tourId], references: [id], onDelete: Cascade)
-  date              DateTime
-  establishmentCode String
-  establishmentName String
-  location          String
-  inspectionPurpose String
-  observations      String
-  status            InspectionStatus @default(PENDING)
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+model InspectionVisit {
+  id                   String               @id @default(uuid())
+  tourProgramId        String
+  tourProgram          TourProgram          @relation(fields: [tourProgramId], references: [id], onDelete: Cascade)
+  officerId            String
+  officer              User                 @relation(fields: [officerId], references: [id], onDelete: Cascade)
+  visitDate            DateTime
+  dayType              DayType              @default(TOUR_DAY)
+  establishmentId      String?
+  establishment        Establishment?       @relation(fields: [establishmentId], references: [id], onDelete: SetNull)
+  rawEstablishmentName String?              // Raw name from diary if uncovered/not mapped
+  rawEstablishmentCode String?              // Raw code e.g. "OR/6276"
+  location             String               // e.g. "Danagadi, Jajpur", "CDA, Cuttack"
+  durationDays         Int                  @default(1)
+  purposeId            String?
+  purpose              VisitPurposeMaster?  @relation(fields: [purposeId], references: [id], onDelete: SetNull)
+  workDoneDetails      String               // e.g. "PMVBRY campaigning", "Compliance Audit"
+  orderRef             String?              // e.g. "Comp.Audit/Exempted Est./2024-25/818"
+  distanceKm           Float                @default(0)
+  conveyanceModeId     String?
+  conveyanceMode       ConveyanceModeMaster? @relation(fields: [conveyanceModeId], references: [id], onDelete: SetNull)
+  vehicleDetails       String?              // e.g. "Own Car accompanied with Sh.M.R.Mohapatra, E.O"
+  hotelStayed          Boolean              @default(false)
+  hotelName            String?
+  hotelAmount          Float                @default(0)
+  reportSubmittedRef   String?              // Inspection report reference number
+  reportDate           DateTime?
+  status               InspectionStatus     @default(CONDUCTED)
+  remarks              String?              // e.g. "May be allowed to take own car"
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
 
-  @@map("inspection_logs")
+  @@index([tourProgramId])
+  @@index([officerId])
+  @@index([visitDate])
+  @@index([rawEstablishmentCode])
+  @@map("inspection_visits")
 }
 
-model Claim {
-  id           String        @id @default(uuid())
-  tourId       String
-  tour         TourProgram   @relation(fields: [tourId], references: [id], onDelete: Cascade)
-  officerId    String
-  officer      User          @relation(fields: [officerId], references: [id], onDelete: Cascade)
-  totalAmount  Float
-  taAmount     Float
-  daAmount     Float
-  hotelAmount  Float         @default(0)
-  otherAmount  Float         @default(0)
-  status       ClaimStatus   @default(DRAFT)
-  remarks      String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  expenseItems ExpenseItem[]
+model TaDaClaim {
+  id               String        @id @default(uuid())
+  tourProgramId    String
+  tourProgram      TourProgram   @relation(fields: [tourProgramId], references: [id], onDelete: Cascade)
+  officerId        String
+  officer          User          @relation(fields: [officerId], references: [id], onDelete: Cascade)
+  taAmount         Float         @default(0) // Travel Allowance total
+  daAmount         Float         @default(0) // Daily Allowance total
+  hotelAmount      Float         @default(0) // Hotel Stay total
+  contingencyAmount Float        @default(0) // Other Expenses total
+  totalClaimAmount Float         @default(0) // Grand Total
+  status           ClaimStatus   @default(DRAFT)
+  submittedAt      DateTime?
+  approvedAt       DateTime?
+  remarks          String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  expenseItems     ExpenseItem[]
 
-  @@map("claims")
+  @@index([tourProgramId])
+  @@index([officerId])
+  @@index([status])
+  @@map("tada_claims")
 }
 
 model ExpenseItem {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   claimId     String
-  claim       Claim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
-  date        DateTime
-  category    String
+  claim       TaDaClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  expenseDate DateTime
+  category    String    // "TA", "DA", "HOTEL", "OTHER"
   description String
   amount      Float
   receiptRef  String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
+  @@index([claimId])
   @@map("expense_items")
 }

@@ -1,13 +1,56 @@
-export type UserRole = 'EO_AO' | 'APFC' | 'RPFC' | 'ADMIN';
+import {
+  UserRole,
+  CoverageStatus,
+  TourStatus,
+  InspectionStatus,
+  ClaimStatus,
+  DayType
+} from '@prisma/client';
 
-export type TourStatusType = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'IN_PROGRESS' | 'COMPLETED';
+export {
+  UserRole,
+  CoverageStatus,
+  TourStatus,
+  InspectionStatus,
+  ClaimStatus,
+  DayType
+};
 
-export type InspectionStatusType = 'PENDING' | 'CONDUCTED' | 'DEFERRED' | 'NON_COMPLIANT_FOUND';
+export interface RegionalOfficeDTO {
+  id: string;
+  officeCode: string;
+  officeName: string;
+  district: string;
+  state: string;
+}
 
-export type ClaimStatusType = 'DRAFT' | 'SUBMITTED' | 'VERIFIED_BY_APFC' | 'APPROVED_BY_RPFC' | 'REJECTED' | 'DISBURSED';
+export interface EstablishmentDTO {
+  id: string;
+  establishmentCode: string;
+  name: string;
+  location: string;
+  district: string;
+  coverageStatus: CoverageStatus;
+  industryType?: string | null;
+}
+
+export interface VisitPurposeDTO {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+}
+
+export interface ConveyanceModeDTO {
+  id: string;
+  code: string;
+  name: string;
+  ratePerKm: number;
+}
 
 export interface UserProfile {
   id: string;
+  pfStaffId?: string | null;
   name: string;
   email: string;
   designation: string;
@@ -20,13 +63,13 @@ export interface TourProgramItem {
   officerId: string;
   officerName?: string;
   title: string;
-  purpose: string;
   month: number;
   year: number;
   startDate: string;
   endDate: string;
-  status: TourStatusType;
-  remarks?: string;
+  status: TourStatus;
+  officeOrderRef?: string | null;
+  remarks?: string | null;
   inspectionsCount?: number;
   createdAt: string;
 }
@@ -34,13 +77,21 @@ export interface TourProgramItem {
 export interface InspectionLogItem {
   id: string;
   tourId: string;
-  date: string;
+  visitDate: string;
   establishmentCode: string;
   establishmentName: string;
   location: string;
   inspectionPurpose: string;
+  workDoneDetails?: string;
   observations: string;
-  status: InspectionStatusType;
+  distanceKm?: number;
+  conveyanceMode?: string;
+  vehicleDetails?: string;
+  orderRef?: string | null;
+  hotelStayed?: boolean;
+  hotelName?: string | null;
+  hotelAmount?: number;
+  status: InspectionStatus;
 }
 
 export interface ClaimItem {
@@ -53,7 +104,7 @@ export interface ClaimItem {
   daAmount: number;
   hotelAmount: number;
   otherAmount: number;
-  status: ClaimStatusType;
-  remarks?: string;
+  status: ClaimStatus;
+  remarks?: string | null;
   createdAt: string;
 }

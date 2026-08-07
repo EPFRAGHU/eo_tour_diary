@@ -1,0 +1,136 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('🌱 Seeding EPFO EO Tour Diary master lookup tables...');
+
+  // 1. Regional Offices Lookup
+  const officeCuttack = await prisma.regionalOffice.upsert({
+    where: { officeCode: 'CTC' },
+    update: {},
+    create: {
+      officeCode: 'CTC',
+      officeName: 'District Office, Cuttack',
+      district: 'Cuttack',
+      state: 'Odisha',
+    },
+  });
+
+  const officeBhubaneswar = await prisma.regionalOffice.upsert({
+    where: { officeCode: 'BBS' },
+    update: {},
+    create: {
+      officeCode: 'BBS',
+      officeName: 'Regional Office, Bhubaneswar',
+      district: 'Khurda',
+      state: 'Odisha',
+    },
+  });
+
+  console.log('✅ Regional Offices seeded:', officeCuttack.officeCode, officeBhubaneswar.officeCode);
+
+  // 2. Visit Purpose Masters Lookup
+  const purposes = [
+    { code: 'PMVBRY', name: 'PMVBRY Registration & Campaigning', category: 'CAMPAIGN' },
+    { code: 'COMPLIANCE_AUDIT', name: 'Compliance Audit of Exempted / Unexempted Estt', category: 'COMPLIANCE' },
+    { code: 'SECTION_7A', name: 'Section 7A Enquiry Verification', category: 'ENQUIRY' },
+    { code: 'SECTION_14B', name: 'Section 14B Damages Default Check', category: 'ENQUIRY' },
+    { code: 'EEC_CAMPAIGN', name: 'EEC Campaign & Uncovered Coverage Check', category: 'CAMPAIGN' },
+    { code: 'DEATH_CLAIM', name: 'Death Claim / Pension Verification', category: 'VERIFICATION' },
+    { code: 'LABOUR_CODE', name: 'Labour Code Awareness Camp', category: 'CAMPAIGN' },
+    { code: 'NAN_DUTY', name: 'NAN Aspirational Block Duty', category: 'SPECIAL_DUTY' },
+    { code: 'OFFICE_DUTY', name: 'Attended Office Day / Meeting', category: 'OFFICE' },
+  ];
+
+  for (const p of purposes) {
+    await prisma.visitPurposeMaster.upsert({
+      where: { code: p.code },
+      update: { name: p.name, category: p.category },
+      create: p,
+    });
+  }
+  console.log(`✅ ${purposes.length} Visit Purposes seeded.`);
+
+  // 3. Conveyance Mode Masters Lookup
+  const modes = [
+    { code: 'OWN_CAR', name: 'Own Car / Four Wheeler', ratePerKm: 16.0 },
+    { code: 'SHARED_EO_CAR', name: 'Car of another EO (Shared)', ratePerKm: 0.0 },
+    { code: 'DEPT_VEHICLE', name: 'Departmental / Official Car', ratePerKm: 0.0 },
+    { code: 'PUBLIC_BUS', name: 'Public Bus / Express Transit', ratePerKm: 4.0 },
+    { code: 'TRAIN_RAIL', name: 'Rail / Train Transport', ratePerKm: 3.5 },
+  ];
+
+  for (const m of modes) {
+    await prisma.conveyanceModeMaster.upsert({
+      where: { code: m.code },
+      update: { name: m.name, ratePerKm: m.ratePerKm },
+      create: m,
+    });
+  }
+  console.log(`✅ ${modes.length} Conveyance Modes seeded.`);
+
+  // 4. Sample Official Establishments Parsed from Excel
+  const establishments = [
+    {
+      establishmentCode: 'OR/6276',
+      name: 'M/s Jindal Stainless Steel Ltd',
+      location: 'Danagadi, Jajpur',
+      district: 'Jajpur',
+      coverageStatus: 'COVERED' as const,
+      industryType: 'Manufacturing / Metallurgy',
+    },
+    {
+      establishmentCode: 'OR/BBS/1238',
+      name: 'M/s Bhimtanagar Sukinda Chromite Mines',
+      location: 'Sukinda, Jajpur',
+      district: 'Jajpur',
+      coverageStatus: 'EXEMPTED' as const,
+      industryType: 'Mining & Extraction',
+    },
+    {
+      establishmentCode: 'OR/BBS/5077',
+      name: 'M/s NTPC Kanhia Thermal Power Plant',
+      location: 'Kanhia, Angul',
+      district: 'Angul',
+      coverageStatus: 'COVERED' as const,
+      industryType: 'Power Generation',
+    },
+    {
+      establishmentCode: 'OR/BBS/16917/24',
+      name: 'M/s Executive Engineer, Mahanadi South Division',
+      location: 'Cuttack',
+      district: 'Cuttack',
+      coverageStatus: 'GOVT_UNDERTAKING' as const,
+      industryType: 'Public Works / Irrigation',
+    },
+    {
+      establishmentCode: 'OR/BBS/888',
+      name: 'M/s TTPS Angul',
+      location: 'Angul',
+      district: 'Angul',
+      coverageStatus: 'COVERED' as const,
+      industryType: 'Thermal Power',
+    },
+  ];
+
+  for (const est of establishments) {
+    await prisma.establishment.upsert({
+      where: { establishmentCode: est.establishmentCode },
+      update: { name: est.name, location: est.location },
+      create: est,
+    });
+  }
+  console.log(`✅ ${establishments.length} Standard Establishments seeded.`);
+
+  console.log('🎉 Seeding completed successfully!');
+}
+
+main()
+  .catch((e) => {
+    console.error('❌ Seeding error:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
