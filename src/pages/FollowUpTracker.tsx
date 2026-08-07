@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
 import {
-  AlertTriangle,
   Plus,
   Clock,
   Calendar,
   CheckCircle2,
   Edit2,
   Trash2,
-  Building2,
   Search,
-  Filter,
-  ArrowRight,
-  ShieldCheck,
-  ChevronRight
+  Filter
 } from 'lucide-react';
 import { FollowUpItem, EstablishmentDTO } from '@/types';
 import { formatDate } from '@/lib/utils';
@@ -20,10 +15,10 @@ import { FollowUpModal } from '@/components/followups/FollowUpModal';
 
 interface FollowUpTrackerProps {
   establishments: EstablishmentDTO[];
-  onNavigate: (tab: string) => void;
+  onNavigate?: (tab: string) => void;
 }
 
-export const FollowUpTracker: React.FC<FollowUpTrackerProps> = ({ establishments, onNavigate }) => {
+export const FollowUpTracker: React.FC<FollowUpTrackerProps> = ({ establishments }) => {
   const [statusTab, setStatusTab] = useState<string>('ALL');
   const [priorityFilter, setPriorityFilter] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
