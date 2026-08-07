@@ -9,6 +9,7 @@ import {
   FolderOpen,
   PhoneCall,
   AlertTriangle,
+  BarChart3,
   Settings,
   ChevronRight
 } from 'lucide-react';
@@ -22,6 +23,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
+    { id: 'analytics', label: 'Analytics Charts', icon: BarChart3, badge: 'Live' },
     { id: 'tours', label: 'Tour Schedule', icon: CalendarDays, badge: 'Active' },
     { id: 'inspections', label: 'Inspection Logs', icon: FileCheck2, badge: null },
     { id: 'followups', label: 'Pending Follow-ups', icon: AlertTriangle, badge: '4 Pending' },

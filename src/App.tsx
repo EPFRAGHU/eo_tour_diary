@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Layout } from '@/components/common/Layout';
 import { Dashboard } from '@/pages/Dashboard';
+import { AnalyticsDashboard } from '@/pages/AnalyticsDashboard';
 import { TourPrograms } from '@/pages/TourPrograms';
 import { InspectionLogs } from '@/pages/InspectionLogs';
 import { Establishments } from '@/pages/Establishments';
@@ -206,6 +207,13 @@ export function App() {
           inspections={inspections}
           claims={claims}
           onNavigate={setActiveTab}
+        />
+      )}
+      {activeTab === 'analytics' && (
+        <AnalyticsDashboard
+          establishments={establishments}
+          tours={tours}
+          inspections={inspections}
         />
       )}
       {activeTab === 'tours' && (
