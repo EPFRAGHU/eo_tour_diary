@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { CalendarDays, Plus, MapPin, CheckCircle2, Clock, XCircle, Send, FileEdit, BookOpen } from 'lucide-react';
+import { CalendarDays, Plus, MapPin, CheckCircle2, Clock, XCircle, Send, FileEdit, BookOpen, MessageSquare } from 'lucide-react';
 import { TourProgramItem } from '@/types';
 import { formatDate } from '@/lib/utils';
 import { TourDiaryFormBuilder } from '@/components/diary/TourDiaryFormBuilder';
 import { DailyVisitEntry } from '@/components/diary/DailyDiaryEntryForm';
+import { RemarksManager } from '@/components/remarks/RemarksManager';
 
 interface TourProgramsProps {
   tours: TourProgramItem[];
@@ -13,6 +14,7 @@ interface TourProgramsProps {
 export const TourPrograms: React.FC<TourProgramsProps> = ({ tours, onAddTour }) => {
   const [viewMode, setViewMode] = useState<'LIST' | 'BUILDER'>('LIST');
   const [showModal, setShowModal] = useState(false);
+  const [activeRemarksTourId, setActiveRemarksTourId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -86,7 +88,7 @@ export const TourPrograms: React.FC<TourProgramsProps> = ({ tours, onAddTour }) 
         <div>
           <h2 className="text-lg font-bold text-foreground">Monthly Tour Program & Daily Diary</h2>
           <p className="text-xs text-muted-foreground">
-            Schedule monthly proposals or build multi-entry daily inspection tour diaries.
+            Schedule monthly proposals, build multi-entry daily inspection tour diaries, and collaborate with official remarks.
           </p>
         </div>
 
@@ -172,12 +174,22 @@ export const TourPrograms: React.FC<TourProgramsProps> = ({ tours, onAddTour }) 
                       <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                       <span>{formatDate(tour.startDate)} - {formatDate(tour.endDate)}</span>
                     </div>
-                    {tour.inspectionsCount !== undefined && (
-                      <span className="text-[10px] font-bold bg-muted px-2 py-0.5 rounded">
-                        {tour.inspectionsCount} Entries
-                      </span>
-                    )}
+
+                    <button
+                      onClick={() => setActiveRemarksTourId(activeRemarksTourId === tour.id ? null : tour.id)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-epfo-navy/10 text-epfo-navy dark:text-epfo-slate font-bold hover:bg-epfo-navy hover:text-white transition-all text-[10px]"
+                    >
+                      <MessageSquare className="w-3 h-3 text-epfo-accent" />
+                      <span>Remarks System</span>
+                    </button>
                   </div>
+
+                  {/* Remarks System Collapse */}
+                  {activeRemarksTourId === tour.id && (
+                    <div className="pt-3 border-t border-border/80 animate-in fade-in duration-200">
+                      <RemarksManager />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
