@@ -5,6 +5,7 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '@/providers/AuthProvider';
 import { NotificationCenterModal } from '@/components/notifications/NotificationCenterModal';
 import { AuditLogViewerModal } from '@/components/security/AuditLogViewerModal';
+import { getDefaultOfficeName } from '@/lib/officeConfig';
 
 interface HeaderProps {
   user: UserProfile;
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab, onNavigate }) =
   const { logout } = useAuth();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const defaultOffice = getDefaultOfficeName();
 
   return (
     <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border px-4 lg:px-8 py-3 transition-colors">
@@ -29,8 +31,8 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab, onNavigate }) =
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold tracking-wider text-epfo-accent uppercase">EPFO Portal</span>
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[10px] bg-epfo-navy/10 dark:bg-epfo-navy/40 text-epfo-navy dark:text-epfo-slate px-2 py-0.5 rounded-full font-medium">
-                {user.officeRegion}
+              <span className="text-[10px] bg-epfo-navy/10 dark:bg-epfo-navy/40 text-epfo-navy dark:text-epfo-slate px-2 py-0.5 rounded-full font-bold">
+                {user.officeRegion || defaultOffice}
               </span>
             </div>
             <h1 className="text-base font-bold capitalize text-foreground tracking-tight">

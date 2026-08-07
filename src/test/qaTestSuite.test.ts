@@ -80,7 +80,7 @@ export const runAllQATests = (): { passed: number; failed: number; total: number
   assert(!updatedDrafts.some((d) => d.id === testDraftId), 'Offline storage clears draft item successfully');
 
   // Test 3.3: Security Audit Log Recording
-  logAuditAction('Rajesh Sharma', 'EO', 'TEST_ACTION', 'Resource #101', 'QA Test Execution', 'SUCCESS');
+  logAuditAction('Shri Raghunatha Maharana', 'EO', 'TEST_ACTION', 'Resource #101', 'QA Test Execution', 'SUCCESS');
   const auditLogs = getAuditLogs();
   assert(auditLogs.length > 0 && auditLogs[0].action === 'TEST_ACTION', 'Audit log engine appends security audit entry');
 

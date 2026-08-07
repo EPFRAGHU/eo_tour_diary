@@ -21,3 +21,6 @@ build/
 prisma/*.db
 prisma/*.db-journal
 node_modules
+
+# Temp raw downloads
+downloadest-master*.csv

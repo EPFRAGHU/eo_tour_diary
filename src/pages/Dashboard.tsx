@@ -29,6 +29,7 @@ import {
 } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { QuickActionModal } from '@/components/dashboard/QuickActionModal';
+import { getDefaultOfficeName } from '@/lib/officeConfig';
 
 interface DashboardProps {
   user: UserProfile;
@@ -55,7 +56,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const pendingVisits = [
     {
       id: 'p-1',
-      code: 'OR/6019',
+      code: 'OR/BBS/6019',
       name: 'M/S Bharat Security & Allied Services',
       location: 'Dist Office, Cuttack',
       reason: 'PMVBRY enrolment check & Form 11 notice',
@@ -63,7 +64,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     },
     {
       id: 'p-2',
-      code: 'OR/104724',
+      code: 'OR/BBS/104724',
       name: 'M/S Magma Food Processors',
       location: 'CDA Sector 9, Cuttack',
       reason: 'Coverage eligibility verification under Sec 1(3)(b)',
@@ -75,7 +76,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [followUps] = useState<FollowUpItem[]>([
     {
       id: 'f-1',
-      establishmentCode: 'MH/BAN/0045231/000',
+      establishmentCode: 'OR/BBS/0045231/000',
       establishmentName: 'Apex Logistics & Freight India Pvt Ltd',
       dueDate: '2026-08-14',
       type: 'FORM_11_NOTICE',
@@ -85,7 +86,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     },
     {
       id: 'f-2',
-      establishmentCode: 'OR/6276',
+      establishmentCode: 'OR/BBS/6276',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
       dueDate: '2026-08-18',
       type: '14B_DAMAGES',
@@ -104,16 +105,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
       refNumber: 'OR/DO/CTC/Compliance/810/2026',
       uploadedAt: '2026-08-05',
       fileSize: '1.8 MB',
-      establishmentCode: 'MH/BAN/0045231/000',
+      establishmentCode: 'OR/BBS/0045231/000',
       establishmentName: 'Apex Logistics & Freight India Pvt Ltd',
-      folderPath: '/MH-BAN-0045231-000/Inspection Reports/',
+      folderPath: '/OR-BBS-0045231-000/Inspection Reports/',
       fileFormat: 'PDF',
       currentVersion: 'v1.2',
       versions: [
         {
           version: 'v1.2',
           uploadedAt: '2026-08-05',
-          uploadedBy: 'Rajesh Sharma (EO/AO)',
+          uploadedBy: 'Raghunatha Maharana (EO/AO)',
           fileName: 'Apex_Logistics_Report.pdf',
           fileSize: '1.8 MB',
         },
@@ -166,31 +167,31 @@ export const Dashboard: React.FC<DashboardProps> = ({
     section14bAmount: 125000,
   });
 
-  // Widget 9: Recent Activity Timeline
+  // Widget 8: Activity Feed
   const [activities, setActivities] = useState<ActivityFeedItem[]>([
     {
       id: 'act-1',
-      timestamp: 'Today, 10:30 AM',
-      title: 'Logged Field Inspection Note',
-      description: 'Logged site visit for Apex Logistics (MH/BAN/0045231/000).',
+      timestamp: '10:45 AM',
+      title: 'Inspection Note Uploaded',
+      description: 'Uploaded final 7A verification note for Apex Logistics (OR/BBS/0045231/000).',
       category: 'INSPECTION',
-      badgeColor: 'bg-emerald-500',
+      badgeColor: 'bg-emerald-600',
     },
     {
       id: 'act-2',
-      timestamp: 'Yesterday, 04:15 PM',
-      title: 'TA / DA Claim Submitted',
-      description: 'Submitted claim bill for ₹3,450 for Special Compliance Drive.',
-      category: 'CLAIM',
-      badgeColor: 'bg-amber-500',
+      timestamp: 'Yesterday',
+      title: 'Monthly Tour Proposal Approved',
+      description: 'APFC approved Special Compliance Drive for Andheri East Zone.',
+      category: 'TOUR',
+      badgeColor: 'bg-blue-600',
     },
     {
       id: 'act-3',
-      timestamp: '05 Aug 2026',
-      title: 'Tour Program Approved',
-      description: 'APFC approved Special Compliance Drive tour schedule.',
-      category: 'TOUR',
-      badgeColor: 'bg-blue-500',
+      timestamp: '04 Aug',
+      title: 'Section 14B Recovery Received',
+      description: 'Logged ₹1,25,000 demand payment from Jindal Stainless Steel (OR/BBS/6276).',
+      category: 'RECOVERY',
+      badgeColor: 'bg-emerald-600',
     },
   ]);
 
@@ -221,16 +222,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
           refNumber: data.code || `REF-${Date.now()}`,
           uploadedAt: new Date().toISOString().split('T')[0],
           fileSize: '1.2 MB',
-          establishmentCode: 'OR/6276',
+          establishmentCode: 'OR/BBS/6276',
           establishmentName: data.name,
-          folderPath: '/OR-6276/Inspection Reports/',
+          folderPath: '/OR-BBS-6276/Inspection Reports/',
           fileFormat: 'PDF',
           currentVersion: 'v1.0',
           versions: [
             {
               version: 'v1.0',
               uploadedAt: new Date().toISOString().split('T')[0],
-              uploadedBy: 'Rajesh Sharma (EO/AO)',
+              uploadedBy: 'Raghunatha Maharana (EO/AO)',
               fileName: `${data.name}.pdf`,
               fileSize: '1.2 MB',
             },
@@ -249,7 +250,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="flex items-center justify-between">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-epfo-accent border border-white/20">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Enforcement Officer Portal • {user.officeRegion}</span>
+              <span>Enforcement Officer Portal • {user.officeRegion || getDefaultOfficeName()}</span>
             </div>
             <span className="text-xs font-bold bg-white/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
               Role: {user.role}

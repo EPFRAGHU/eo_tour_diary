@@ -30,6 +30,29 @@ async function main() {
 
   console.log('✅ Regional Offices seeded:', officeCuttack.officeCode, officeBhubaneswar.officeCode);
 
+  // 1b. Primary Super Admin User Seed
+  const superAdmin = await prisma.user.upsert({
+    where: { email: 'raghunatha.maharana@gmail.com' },
+    update: { role: 'SUPER_ADMIN', status: 'ACTIVE' },
+    create: {
+      pfStaffId: 'PF-HQ-001',
+      epfoEmpNumber: 'EPFO/HQ/SUPER/001',
+      email: 'raghunatha.maharana@gmail.com',
+      username: 'raghunatha.admin',
+      name: 'Shri Raghunatha Maharana',
+      designation: 'Super Administrator / Additional Central PF Commissioner',
+      role: 'SUPER_ADMIN',
+      status: 'ACTIVE',
+      officeId: officeBhubaneswar.id,
+      region: 'Odisha Zone',
+      district: 'Khordha / Bhubaneswar',
+      mobile: '+91 94370 12345',
+      isMfaEnabled: true,
+      notes: 'Primary Super Admin account. Protected system privileges.',
+    },
+  });
+  console.log('✅ Super Admin account seeded:', superAdmin.email);
+
   // 2. Visit Purpose Masters Lookup
   const purposes = [
     { code: 'PMVBRY', name: 'PMVBRY Registration & Campaigning', category: 'CAMPAIGN' },
@@ -73,7 +96,7 @@ async function main() {
   // 4. Sample Official Establishments Parsed from Excel
   const establishments = [
     {
-      establishmentCode: 'OR/6276',
+      establishmentCode: 'OR/BBS/6276',
       name: 'M/s Jindal Stainless Steel Ltd',
       location: 'Danagadi, Jajpur',
       district: 'Jajpur',

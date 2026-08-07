@@ -1,108 +1,61 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserRole, UserProfile } from '@/types';
+import React, { createContext, useContext, useState } from 'react';
+import { UserProfile, UserRole } from '@/types';
 
 interface AuthContextType {
   user: UserProfile | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
   login: (token: string, user: UserProfile) => void;
   logout: () => void;
-  hasRole: (roles: UserRole[]) => boolean;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  hasRole: (allowedRoles: UserRole[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const DEMO_USERS: Record<string, UserProfile> = {
-  eo: {
-    id: 'eo-101',
-    pfStaffId: 'EPFO/EO/4502',
-    name: 'Shri Rajesh Sharma',
-    email: 'rajesh.sharma@epfindia.gov.in',
-    designation: 'Enforcement Officer (EO/AO)',
-    officeRegion: 'RO Mumbai (Bandra)',
-    role: 'EO',
-  },
-  apfc: {
-    id: 'apfc-201',
-    pfStaffId: 'EPFO/APFC/1104',
-    name: 'Smt. Anita Roy',
-    email: 'anita.roy@epfindia.gov.in',
-    designation: 'Assistant PF Commissioner (Compliance)',
-    officeRegion: 'RO Mumbai (Bandra)',
-    role: 'APFC',
-  },
-  admin: {
-    id: 'admin-001',
-    pfStaffId: 'EPFO/ADM/0001',
-    name: 'System Administrator',
-    email: 'admin.portal@epfindia.gov.in',
-    designation: 'Portal Administrator',
-    officeRegion: 'Headquarters, New Delhi',
-    role: 'ADMIN',
-  },
-  viewer: {
-    id: 'viewer-301',
-    pfStaffId: 'EPFO/AUD/9901',
-    name: 'Auditor Inspection Viewer',
-    email: 'auditor.view@epfindia.gov.in',
-    designation: 'Audit & Vigilance Inspector',
-    officeRegion: 'RO Mumbai (Bandra)',
-    role: 'VIEWER',
-  },
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(DEMO_USERS.eo);
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('auth_token') || 'demo-jwt-token-eo');
   const [isLoading] = useState(false);
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
-    const storedRole = localStorage.getItem('auth_role') as UserRole | null;
-
-    if (storedToken) {
-      setToken(storedToken);
-      if (storedRole && storedRole.toLowerCase() in DEMO_USERS) {
-        setUser(DEMO_USERS[storedRole.toLowerCase()]);
-      } else {
-        setUser(DEMO_USERS.eo);
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    // Default Officer Profile: Shri Raghunatha Maharana
+    const stored = localStorage.getItem('epfo_user_session');
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch (e) {
+        // Fallback
       }
     }
-  }, []);
+    return {
+      id: 'usr-super-admin-1',
+      name: 'Shri Raghunatha Maharana',
+      email: 'raghunatha.maharana@gmail.com',
+      officialEmail: 'raghunatha.maharana@gmail.com',
+      designation: 'Super Administrator / Additional Central PF Commissioner',
+      officeRegion: 'HQ / RO Bhubaneswar',
+      role: 'SUPER_ADMIN' as UserRole,
+      pfStaffId: 'PF-HQ-001',
+    };
+  });
 
-  const login = (newToken: string, newUser: UserProfile) => {
-    localStorage.setItem('auth_token', newToken);
-    localStorage.setItem('auth_role', newUser.role);
-    setToken(newToken);
+  const login = (token: string, newUser: UserProfile) => {
+    localStorage.setItem('epfo_jwt_token', token);
+    localStorage.setItem('epfo_user_session', JSON.stringify(newUser));
     setUser(newUser);
   };
 
   const logout = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_role');
-    setToken(null);
+    localStorage.removeItem('epfo_jwt_token');
+    localStorage.removeItem('epfo_user_session');
     setUser(null);
   };
 
-  const hasRole = (roles: UserRole[]) => {
+  const hasRole = (allowedRoles: UserRole[]): boolean => {
     if (!user) return false;
-    if (user.role === 'ADMIN') return true;
-    return roles.includes(user.role) || (roles.includes('EO') && user.role === 'EO_AO');
+    if (user.role === 'SUPER_ADMIN' || user.email.toLowerCase() === 'raghunatha.maharana@gmail.com') return true;
+    return allowedRoles.includes(user.role);
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isAuthenticated: !!token && !!user,
-        isLoading,
-        login,
-        logout,
-        hasRole,
-      }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, isLoading, hasRole }}>
       {children}
     </AuthContext.Provider>
   );
@@ -110,6 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
   return context;
 };

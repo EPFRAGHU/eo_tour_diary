@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Send, CheckCircle2, CalendarDays } from 'lucide-react';
+import { Plus, Send, CheckCircle2, CalendarDays, FileSpreadsheet } from 'lucide-react';
 import { DailyDiaryEntryForm, DailyVisitEntry } from './DailyDiaryEntryForm';
+import { exportTourDiaryToExcel } from '@/lib/excelExport';
 
 interface TourDiaryFormBuilderProps {
   initialEntries?: DailyVisitEntry[];
@@ -40,7 +41,7 @@ export const TourDiaryFormBuilder: React.FC<TourDiaryFormBuilderProps> = ({
         visitDate: new Date().toISOString().split('T')[0],
         dayType: 'TOUR_DAY',
         establishmentName: 'M/s Jindal Stainless Steel Ltd',
-        establishmentCode: 'OR/6276',
+        establishmentCode: 'OR/BBS/6276',
         location: 'Danagadi, Jajpur',
         durationDays: 1,
         purpose: 'PMVBRY campaigning & 14B damages check',
@@ -257,6 +258,16 @@ export const TourDiaryFormBuilder: React.FC<TourDiaryFormBuilderProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => exportTourDiaryToExcel({ entries, month: 8, year: 2026 })}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold shadow-sm transition-all"
+              title="Download Current Draft Tour Diary in Excel (.xls)"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
+              <span>Export Draft (.xls)</span>
+            </button>
+
             {onCancel && (
               <button
                 type="button"

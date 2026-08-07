@@ -202,7 +202,7 @@ export const DailyDiaryEntryForm: React.FC<DailyDiaryEntryFormProps> = ({
               <label className="font-bold text-foreground">Estt Code / Reg *</label>
               <input
                 type="text"
-                placeholder="e.g., OR/6276"
+                placeholder="e.g., OR/BBS/6276"
                 value={entry.establishmentCode}
                 onChange={(e) => handleChange('establishmentCode', e.target.value)}
                 className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-mono uppercase"

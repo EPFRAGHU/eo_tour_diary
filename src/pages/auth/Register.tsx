@@ -8,7 +8,7 @@ export const Register: React.FC = () => {
     name: '',
     email: '',
     designation: 'Enforcement Officer (EO/AO)',
-    officeRegion: 'RO Mumbai (Bandra)',
+    officeRegion: 'RO Bhubaneswar / RO Mumbai (Bandra)',
     password: '',
   });
 
@@ -37,7 +37,7 @@ export const Register: React.FC = () => {
               <input
                 type="text"
                 required
-                placeholder="Shri Rajesh Sharma"
+                placeholder="Shri Raghunatha Maharana"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full pl-9 pr-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
@@ -52,7 +52,7 @@ export const Register: React.FC = () => {
               <input
                 type="email"
                 required
-                placeholder="rajesh.sharma@epfindia.gov.in"
+                placeholder="raghunatha.maharana@epfindia.gov.in"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full pl-9 pr-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
@@ -67,7 +67,7 @@ export const Register: React.FC = () => {
               <input
                 type="text"
                 required
-                placeholder="RO Mumbai (Bandra)"
+                placeholder="RO Bhubaneswar / RO Mumbai (Bandra)"
                 value={formData.officeRegion}
                 onChange={(e) => setFormData({ ...formData, officeRegion: e.target.value })}
                 className="w-full pl-9 pr-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"

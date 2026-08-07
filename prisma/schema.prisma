@@ -15,11 +15,32 @@ datasource db {
 // ==========================================
 
 enum UserRole {
-  ADMIN       // System Administrator
-  APFC        // Assistant Provident Fund Commissioner
-  EO          // Enforcement Officer / Accounts Officer
+  SUPER_ADMIN
+  REGIONAL_PF_COMMISSIONER
+  ADDITIONAL_CENTRAL_PF_COMMISSIONER
+  ASSISTANT_PF_COMMISSIONER
+  ENFORCEMENT_OFFICER
+  ACCOUNTS_OFFICER
+  SECTION_SUPERVISOR
+  DATA_ENTRY_OPERATOR
+  READ_ONLY
+  AUDITOR
+  ADMIN       // Legacy System Administrator Alias
+  APFC        // Legacy APFC Alias
+  EO          // Legacy EO Alias
   EO_AO       // Legacy EO/AO Alias
-  VIEWER      // Read-Only Auditor / Inspector Viewer
+  VIEWER      // Legacy Viewer Alias
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  LOCKED
+  PENDING_APPROVAL
+  RETIRED
+  TRANSFERRED
+  DELETED
 }
 
 enum CoverageStatus {
@@ -74,10 +95,16 @@ enum DayType {
 
 model RegionalOffice {
   id         String   @id @default(uuid())
-  officeCode String   @unique // e.g. "CTC", "BBS", "BAN"
-  officeName String   // e.g. "District Office, Cuttack", "Regional Office, Bhubaneswar"
+  officeCode String   @unique // e.g. "DO_CTC", "RO_BBS", "RO_BAN"
+  officeName String   // e.g. "EPFO, DO, Cuttack", "Regional Office, Bhubaneswar"
+  region     String   @default("Odisha Zone")
   district   String
   state      String   @default("Odisha")
+  address    String?  @default("District Office, Sector 1, CDA, Cuttack, Odisha 753014")
+  phone      String?  @default("+91 671 2304567")
+  email      String?  @default("do.cuttack@epfindia.gov.in")
+  status     String   @default("ACTIVE")
+  isDefault  Boolean  @default(false)
   users      User[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -129,22 +156,80 @@ model ConveyanceModeMaster {
 // ==========================================
 
 model User {
-  id             String          @id @default(uuid())
-  pfStaffId      String?         @unique // Official PF Employee ID
-  email          String          @unique
-  name           String          // e.g. "Sri S.N. Behera"
-  designation    String          // e.g. "Enforcement Officer (EO/AO)"
-  role           UserRole        @default(EO)
-  officeId       String?
-  office         RegionalOffice? @relation(fields: [officeId], references: [id], onDelete: SetNull)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  tours          TourProgram[]   @relation("OfficerTours")
-  approvedTours  TourProgram[]   @relation("ApproverTours")
-  inspections    InspectionVisit[]
-  claims         TaDaClaim[]
+  id                 String            @id @default(uuid())
+  pfStaffId          String?           @unique // Official Employee ID
+  epfoEmpNumber      String?           // EPFO Staff Registration Number
+  email              String            @unique
+  username           String?           @unique
+  name               String            // e.g. "Sri S.N. Behera"
+  designation        String            // e.g. "Enforcement Officer (EO/AO)"
+  gender             String?           // Male, Female, Other
+  dob                DateTime?
+  mobile             String?
+  altMobile          String?
+  personalEmail      String?
+  photoUrl           String?
+  region             String?
+  district           String?
+  joiningDate        DateTime?
+  reportingOfficerId String?
+  role               UserRole          @default(EO)
+  status             UserStatus        @default(ACTIVE)
+  notes              String?
+  officeId           String?
+  office             RegionalOffice?   @relation(fields: [officeId], references: [id], onDelete: SetNull)
+  lastLogin          DateTime?
+  failedLoginCount   Int               @default(0)
+  isMfaEnabled       Boolean           @default(false)
+  createdBy          String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  tours              TourProgram[]     @relation("OfficerTours")
+  approvedTours      TourProgram[]     @relation("ApproverTours")
+  inspections        InspectionVisit[]
+  claims             TaDaClaim[]
+  activityLogs       UserActivityLog[]
+  sessions           UserSession[]
 
   @@map("users")
+}
+
+model UserActivityLog {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action      String   // e.g. USER_CREATED, ROLE_CHANGED, PASSWORD_RESET
+  module      String   // e.g. USER_MANAGEMENT, TOUR_DIARY
+  recordId    String?
+  oldValue    String?
+  newValue    String?
+  performedBy String   // Email or Name of performer
+  ipAddress   String?
+  device      String?
+  remarks     String?
+  timestamp   DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@map("user_activity_logs")
+}
+
+model UserSession {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device          String
+  browser         String
+  os              String
+  ipAddress       String
+  location        String?
+  sessionDuration String?
+  isActive        Boolean  @default(true)
+  loginAt         DateTime @default(now())
+  lastActiveAt    DateTime @default(now())
+
+  @@index([userId])
+  @@map("user_sessions")
 }
 
 model TourProgram {

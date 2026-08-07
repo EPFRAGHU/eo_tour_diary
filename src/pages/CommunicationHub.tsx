@@ -26,7 +26,7 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = () => {
   const [contacts] = useState([
     {
       id: 'cnt-1',
-      establishmentCode: 'MH/BAN/0045231/000',
+      establishmentCode: 'OR/BBS/0045231/000',
       establishmentName: 'Apex Logistics & Freight India Pvt Ltd',
       contactPerson: 'Mr. Anil Das',
       designation: 'HR Manager',
@@ -35,7 +35,7 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = () => {
     },
     {
       id: 'cnt-2',
-      establishmentCode: 'OR/6276',
+      establishmentCode: 'OR/BBS/6276',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
       contactPerson: 'Shri R.K. Jena',
       designation: 'General Manager (Personnel)',

@@ -40,7 +40,7 @@ export const FollowUpTracker: React.FC<FollowUpTrackerProps> = ({ establishments
     },
     {
       id: 'f-2',
-      establishmentCode: 'OR/6276',
+      establishmentCode: 'OR/BBS/6276',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
       dueDate: '2026-08-18',
       nextVisitDate: '2026-08-22',

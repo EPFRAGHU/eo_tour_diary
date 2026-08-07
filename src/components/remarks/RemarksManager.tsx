@@ -20,7 +20,7 @@ export const RemarksManager: React.FC<RemarksManagerProps> = ({ initialRemarks }
     return [
       {
         id: 'rem-1',
-        author: 'Rajesh Sharma',
+        author: 'Shri Raghunatha Maharana',
         authorRole: 'EO/AO',
         content: 'May be allowed to take own car for Special Compliance Drive as per Grade IV travel rules.',
         createdAt: '2026-08-05',
@@ -32,7 +32,7 @@ export const RemarksManager: React.FC<RemarksManagerProps> = ({ initialRemarks }
           {
             content: 'May be allowed to take own car.',
             updatedAt: '2026-08-01',
-            author: 'Rajesh Sharma',
+            author: 'Shri Raghunatha Maharana',
           },
         ],
       },
@@ -61,7 +61,7 @@ export const RemarksManager: React.FC<RemarksManagerProps> = ({ initialRemarks }
   }) => {
     const newRemark: RemarkItem = {
       id: `rem-${Date.now()}`,
-      author: 'Rajesh Sharma',
+      author: 'Shri Raghunatha Maharana',
       authorRole: 'EO/AO',
       content: data.content,
       createdAt: new Date().toISOString().split('T')[0],

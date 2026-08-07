@@ -10,26 +10,31 @@ import { CommunicationHub } from '@/pages/CommunicationHub';
 import { FollowUpTracker } from '@/pages/FollowUpTracker';
 import { Claims } from '@/pages/Claims';
 import { Reports } from '@/pages/Reports';
+import { UserManagement } from '@/pages/admin/UserManagement';
 import { TourProgramItem, InspectionLogItem, ClaimItem, EstablishmentDTO } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
+import { SUPER_ADMIN_EMAIL } from '@/lib/securityUtils';
+
+import { formatOdishaEstCode } from '@/lib/utils';
 
 export function App() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const currentUser = user || {
-    id: 'eo-101',
-    name: 'Rajesh Sharma',
-    email: 'rajesh.sharma@epfindia.gov.in',
-    designation: 'Enforcement Officer (EO/AO)',
-    officeRegion: 'RO Mumbai (Bandra)',
-    role: 'EO' as const,
+    id: 'usr-super-admin-1',
+    name: 'Shri Raghunatha Maharana',
+    email: SUPER_ADMIN_EMAIL,
+    officialEmail: SUPER_ADMIN_EMAIL,
+    designation: 'Super Administrator / Additional Central PF Commissioner',
+    officeRegion: 'HQ / RO Bhubaneswar',
+    role: 'SUPER_ADMIN' as const,
   };
 
   const [establishments, setEstablishments] = useState<EstablishmentDTO[]>([
     {
       id: 'est-1',
-      establishmentCode: 'OR/6276',
+      establishmentCode: 'OR/BBS/6276',
       name: 'M/s Jindal Stainless Steel Ltd',
       location: 'Danagadi, Jajpur',
       district: 'Jajpur',
@@ -65,9 +70,9 @@ export function App() {
     },
     {
       id: 'est-5',
-      establishmentCode: 'MH/BAN/0045231/000',
+      establishmentCode: 'OR/BBS/0045231/000',
       name: 'Apex Logistics & Freight India Pvt Ltd',
-      location: 'MIDC Andheri East, Mumbai',
+      location: 'Choudwar Industrial Area, Cuttack',
       district: 'Cuttack',
       coverageStatus: 'COVERED',
       industryType: 'Logistics & Warehousing',
@@ -78,7 +83,7 @@ export function App() {
     {
       id: 'tour-1',
       officerId: currentUser.id,
-      title: 'Special Compliance Drive - Andheri East Zone',
+      title: 'Special Compliance Drive - Cuttack Industrial Zone',
       purpose: 'Inspection of 14B damages defaults & un-enrolled contract worker verification.',
       month: 8,
       year: 2026,
@@ -92,7 +97,7 @@ export function App() {
     {
       id: 'tour-2',
       officerId: currentUser.id,
-      title: 'Routine Inspection Tour - MIDC Sector II',
+      title: 'Routine Inspection Tour - Choudwar Sector II',
       purpose: 'Verification of coverage eligibility for newly registered establishments under Sec 1(3)(b).',
       month: 8,
       year: 2026,
@@ -110,9 +115,9 @@ export function App() {
       id: 'insp-1',
       tourId: 'tour-1',
       date: '2026-08-11',
-      establishmentCode: 'MH/BAN/0045231/000',
+      establishmentCode: 'OR/BBS/0045231/000',
       establishmentName: 'Apex Logistics & Freight India Pvt Ltd',
-      location: 'MIDC Andheri East, Mumbai',
+      location: 'Choudwar Industrial Area, Cuttack',
       inspectionPurpose: 'Section 7A Enquiry Records Examination',
       observations: 'Examined attendance registers and salary slips for May-July 2026. Detected 18 non-enrolled contractual security staff. Issued Form 11 notice.',
       status: 'NON_COMPLIANT_FOUND',
@@ -121,7 +126,7 @@ export function App() {
       id: 'insp-2',
       tourId: 'tour-1',
       date: '2026-08-12',
-      establishmentCode: 'OR/6276',
+      establishmentCode: 'OR/BBS/6276',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
       location: 'Danagadi, Jajpur',
       inspectionPurpose: 'PMVBRY Campaigning & Verification',
@@ -151,13 +156,18 @@ export function App() {
   const handleAddEstablishment = (newEst: Omit<EstablishmentDTO, 'id'>) => {
     const item: EstablishmentDTO = {
       ...newEst,
+      establishmentCode: formatOdishaEstCode(newEst.establishmentCode, newEst.district),
       id: `est-${Date.now()}`,
     };
     setEstablishments([item, ...establishments]);
   };
 
   const handleUpdateEstablishment = (updatedEst: EstablishmentDTO) => {
-    setEstablishments(establishments.map((e) => (e.id === updatedEst.id ? updatedEst : e)));
+    const formatted = {
+      ...updatedEst,
+      establishmentCode: formatOdishaEstCode(updatedEst.establishmentCode, updatedEst.district),
+    };
+    setEstablishments(establishments.map((e) => (e.id === formatted.id ? formatted : e)));
   };
 
   const handleDeleteEstablishment = (id: string) => {
@@ -167,6 +177,7 @@ export function App() {
   const handleImportEstablishments = (imported: Omit<EstablishmentDTO, 'id'>[]) => {
     const newItems: EstablishmentDTO[] = imported.map((item, idx) => ({
       ...item,
+      establishmentCode: formatOdishaEstCode(item.establishmentCode, item.district),
       id: `est-imp-${Date.now()}-${idx}`,
     }));
     setEstablishments([...newItems, ...establishments]);
@@ -250,6 +261,9 @@ export function App() {
       )}
       {activeTab === 'reports' && (
         <Reports user={currentUser} tours={tours} inspections={inspections} claims={claims} />
+      )}
+      {['users', 'roles', 'departments', 'districts', 'audit-logs', 'settings'].includes(activeTab) && (
+        <UserManagement currentUser={currentUser} tours={tours} />
       )}
     </Layout>
   );

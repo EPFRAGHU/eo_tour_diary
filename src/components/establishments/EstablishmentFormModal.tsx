@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { XCircle, Save, Building2 } from 'lucide-react';
 import { EstablishmentDTO, CoverageStatus } from '@/types';
+import { formatOdishaEstCode } from '@/lib/utils';
 
 interface EstablishmentFormModalProps {
   isOpen: boolean;
@@ -27,7 +28,7 @@ export const EstablishmentFormModal: React.FC<EstablishmentFormModalProps> = ({
   useEffect(() => {
     if (establishment) {
       setFormData({
-        establishmentCode: establishment.establishmentCode,
+        establishmentCode: formatOdishaEstCode(establishment.establishmentCode, establishment.district),
         name: establishment.name,
         location: establishment.location,
         district: establishment.district,
@@ -36,7 +37,7 @@ export const EstablishmentFormModal: React.FC<EstablishmentFormModalProps> = ({
       });
     } else {
       setFormData({
-        establishmentCode: '',
+        establishmentCode: 'OR/BBS/',
         name: '',
         location: '',
         district: 'Cuttack',
@@ -52,13 +53,19 @@ export const EstablishmentFormModal: React.FC<EstablishmentFormModalProps> = ({
     e.preventDefault();
     if (!formData.establishmentCode || !formData.name) return;
 
+    const formattedCode = formatOdishaEstCode(formData.establishmentCode, formData.district);
+    const dataToSave = {
+      ...formData,
+      establishmentCode: formattedCode,
+    };
+
     if (establishment) {
       onSave({
         ...establishment,
-        ...formData,
+        ...dataToSave,
       });
     } else {
-      onSave(formData);
+      onSave(dataToSave);
     }
     onClose();
   };

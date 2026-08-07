@@ -194,7 +194,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               {
                 version: document.currentVersion,
                 uploadedAt: document.uploadedAt,
-                uploadedBy: 'Rajesh Sharma (EO/AO)',
+                uploadedBy: 'Raghunatha Maharana (EO/AO)',
                 fileName: `${document.title}.pdf`,
                 fileSize: document.fileSize,
                 changeNotes: 'Initial document upload',

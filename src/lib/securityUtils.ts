@@ -113,6 +113,69 @@ export const rateLimiter = (
   };
 };
 
+export const SUPER_ADMIN_EMAIL = 'raghunatha.maharana@gmail.com';
+
+/**
+ * Checks if the email belongs to the protected Super Admin.
+ */
+export const isSuperAdminEmail = (email: string): boolean => {
+  return email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+};
+
+/**
+ * Checks if a user is the protected Super Admin account.
+ */
+export const isProtectedSuperAdmin = (user: { email: string; role?: UserRole }): boolean => {
+  if (!user) return false;
+  return isSuperAdminEmail(user.email) || user.role === 'SUPER_ADMIN';
+};
+
+/**
+ * Validates password strength (min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char).
+ */
+export const validatePasswordStrength = (password: string): { isValid: boolean; error?: string } => {
+  if (!password || password.length < 8) {
+    return { isValid: false, error: 'Password must be at least 8 characters long' };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { isValid: false, error: 'Password must contain at least one uppercase letter (A-Z)' };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { isValid: false, error: 'Password must contain at least one lowercase letter (a-z)' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { isValid: false, error: 'Password must contain at least one numeric digit (0-9)' };
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return { isValid: false, error: 'Password must contain at least one special character' };
+  }
+  return { isValid: true };
+};
+
+/**
+ * Generates a compliant secure temporary password.
+ */
+export const generateTempPassword = (): string => {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghijkmnopqrstuvwxyz';
+  const digits = '23456789';
+  const symbols = '!@#$%^&*';
+
+  let pwd = '';
+  pwd += upper.charAt(Math.floor(Math.random() * upper.length));
+  pwd += lower.charAt(Math.floor(Math.random() * lower.length));
+  pwd += digits.charAt(Math.floor(Math.random() * digits.length));
+  pwd += symbols.charAt(Math.floor(Math.random() * symbols.length));
+
+  const all = upper + lower + digits + symbols;
+  for (let i = 0; i < 6; i++) {
+    pwd += all.charAt(Math.floor(Math.random() * all.length));
+  }
+
+  // Shuffle string
+  return pwd.split('').sort(() => 0.5 - Math.random()).join('');
+};
+
 /**
  * Logs an append-only security audit log entry.
  */
@@ -156,11 +219,11 @@ export const getAuditLogs = (): AuditLogEntry[] => {
         {
           id: 'audit-baseline-1',
           timestamp: new Date().toISOString(),
-          actorName: 'Rajesh Sharma',
-          actorRole: 'EO',
+          actorName: 'Shri Raghunatha Maharana',
+          actorRole: 'SUPER_ADMIN',
           action: 'AUTH_SESSION_INIT',
-          resourceTarget: 'RO Mumbai (Bandra) Session',
-          details: 'Authenticated via secure JWT token session with EO/AO role privileges.',
+          resourceTarget: 'Super Admin Workspace',
+          details: 'Authenticated via secure JWT token session with Super Admin privileges.',
           ipAddress: '192.168.1.153',
           status: 'SUCCESS',
         },

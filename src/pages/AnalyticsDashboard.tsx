@@ -68,8 +68,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
   // Chart 5: Employer Compliance Breakdown
   const employerCompliance = [
-    { name: 'M/s Jindal Stainless Steel Ltd', code: 'OR/6276', status: 'COMPLIANT', score: 98 },
-    { name: 'Apex Logistics & Freight India Pvt Ltd', code: 'MH/BAN/0045231', status: 'NON_COMPLIANT', score: 62 },
+    { name: 'M/s Jindal Stainless Steel Ltd', code: 'OR/BBS/6276', status: 'COMPLIANT', score: 98 },
+    { name: 'Apex Logistics & Freight India Pvt Ltd', code: 'OR/BBS/0045231', status: 'NON_COMPLIANT', score: 62 },
     { name: 'M/s Bhimtanagar Sukinda Chromite Mines', code: 'OR/BBS/1238', status: 'EXEMPTED', score: 95 },
     { name: 'M/s NTPC Kanhia Thermal Power Plant', code: 'OR/BBS/5077', status: 'COMPLIANT', score: 92 },
   ];

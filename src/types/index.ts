@@ -1,4 +1,29 @@
-export type UserRole = 'ADMIN' | 'APFC' | 'EO' | 'EO_AO' | 'VIEWER';
+export type UserRole =
+  | 'SUPER_ADMIN'
+  | 'REGIONAL_PF_COMMISSIONER'
+  | 'ADDITIONAL_CENTRAL_PF_COMMISSIONER'
+  | 'ASSISTANT_PF_COMMISSIONER'
+  | 'ENFORCEMENT_OFFICER'
+  | 'ACCOUNTS_OFFICER'
+  | 'SECTION_SUPERVISOR'
+  | 'DATA_ENTRY_OPERATOR'
+  | 'READ_ONLY'
+  | 'AUDITOR'
+  | 'ADMIN'
+  | 'APFC'
+  | 'EO'
+  | 'EO_AO'
+  | 'VIEWER';
+
+export type UserStatus =
+  | 'ACTIVE'
+  | 'INACTIVE'
+  | 'SUSPENDED'
+  | 'LOCKED'
+  | 'PENDING_APPROVAL'
+  | 'RETIRED'
+  | 'TRANSFERRED'
+  | 'DELETED';
 
 export type TourStatus =
   | 'DRAFT'
@@ -44,11 +69,95 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  officialEmail?: string;
   designation: string;
   officeRegion: string;
   role: UserRole;
   pfStaffId?: string;
   avatarUrl?: string;
+  photoUrl?: string;
+}
+
+export interface ExtendedUserProfile extends UserProfile {
+  employeeId: string;
+  epfoEmpNumber?: string;
+  username: string;
+  gender?: 'Male' | 'Female' | 'Other';
+  dob?: string;
+  mobile: string;
+  altMobile?: string;
+  officialEmail: string;
+  personalEmail?: string;
+  photoUrl?: string;
+  office: string;
+  region: string;
+  district: string;
+  joiningDate?: string;
+  reportingOfficer?: string;
+  status: UserStatus;
+  notes?: string;
+  lastLogin?: string;
+  failedLoginCount: number;
+  isMfaEnabled: boolean;
+  createdDate: string;
+  createdBy: string;
+}
+
+export type PermissionModule =
+  | 'Dashboard'
+  | 'Tour Diary'
+  | 'Establishments'
+  | 'Documents'
+  | 'Reports'
+  | 'Analytics'
+  | 'User Management'
+  | 'Audit Logs'
+  | 'Settings';
+
+export type PermissionAction =
+  | 'View'
+  | 'Create'
+  | 'Edit'
+  | 'Delete'
+  | 'Approve'
+  | 'Export'
+  | 'Upload'
+  | 'Download'
+  | 'Print'
+  | 'Assign'
+  | 'Configure';
+
+export type RolePermissionsMap = Record<UserRole, Record<PermissionModule, PermissionAction[]>>;
+
+export interface UserActivityLogItem {
+  id: string;
+  userId: string;
+  userEmail: string;
+  timestamp: string;
+  performedBy: string;
+  action: string;
+  module: PermissionModule | 'AUTH' | 'SYSTEM';
+  recordId?: string;
+  oldValue?: string;
+  newValue?: string;
+  ipAddress: string;
+  device?: string;
+  remarks?: string;
+  success: boolean;
+}
+
+export interface UserSessionItem {
+  id: string;
+  userId: string;
+  userEmail: string;
+  device: string;
+  browser: string;
+  os: string;
+  ipAddress: string;
+  location: string;
+  sessionDuration: string;
+  lastActive: string;
+  isActive: boolean;
 }
 
 export interface EstablishmentDTO {

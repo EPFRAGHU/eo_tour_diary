@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { TourProgramItem, InspectionLogItem, ClaimItem, UserProfile } from '@/types';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import { getDefaultOfficeName } from '@/lib/officeConfig';
+import { exportTourDiaryToExcel } from '@/lib/excelExport';
 
 interface ReportsProps {
   user: UserProfile;
@@ -86,6 +88,16 @@ export const Reports: React.FC<ReportsProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Official Tour Diary .xls Export */}
+          <button
+            onClick={() => exportTourDiaryToExcel({ tour: tours[0], month: selectedMonth, year: selectedYear, user })}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold shadow-sm transition-all"
+            title="Download Official Tour Diary Spreadsheet (.xls)"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
+            <span>Export tour_diary.xls</span>
+          </button>
+
           <button
             onClick={() => window.print()}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold shadow-sm transition-all"
@@ -98,7 +110,7 @@ export const Reports: React.FC<ReportsProps> = ({
             onClick={handleExportCSV}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold shadow-sm transition-all"
           >
-            <Download className="w-4 h-4 text-emerald-500" />
+            <Download className="w-4 h-4 text-blue-500" />
             <span>Export CSV</span>
           </button>
 
@@ -192,7 +204,7 @@ export const Reports: React.FC<ReportsProps> = ({
             EMPLOYEES' PROVIDENT FUND ORGANISATION
           </div>
           <div className="text-xs font-bold text-muted-foreground">
-            Ministry of Labour & Employment, Government of India | Regional Office: {user.officeRegion}
+            Ministry of Labour & Employment, Government of India | Office: <strong className="text-foreground">{user.officeRegion || getDefaultOfficeName()}</strong>
           </div>
           <h3 className="text-base font-extrabold text-foreground tracking-tight underline underline-offset-4 pt-1">
             OFFICIAL REPORT: {activeReportType.replace('_', ' ')} - {currentMonthName.toUpperCase()}
@@ -210,8 +222,8 @@ export const Reports: React.FC<ReportsProps> = ({
             <span className="font-bold text-foreground">{user.designation}</span>
           </div>
           <div>
-            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Office Region</span>
-            <span className="font-bold text-foreground">{user.officeRegion}</span>
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Assigned Office</span>
+            <span className="font-bold text-foreground">{user.officeRegion || getDefaultOfficeName()}</span>
           </div>
           <div>
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Report Generated</span>

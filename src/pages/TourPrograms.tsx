@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { CalendarDays, Plus, MapPin, CheckCircle2, Clock, XCircle, Send, FileEdit, BookOpen, MessageSquare } from 'lucide-react';
+import { CalendarDays, Plus, MapPin, CheckCircle2, Clock, XCircle, Send, FileEdit, BookOpen, MessageSquare, FileSpreadsheet } from 'lucide-react';
 import { TourProgramItem } from '@/types';
 import { formatDate } from '@/lib/utils';
 import { TourDiaryFormBuilder } from '@/components/diary/TourDiaryFormBuilder';
 import { DailyVisitEntry } from '@/components/diary/DailyDiaryEntryForm';
 import { RemarksManager } from '@/components/remarks/RemarksManager';
+import { exportTourDiaryToExcel } from '@/lib/excelExport';
 
 interface TourProgramsProps {
   tours: TourProgramItem[];
@@ -114,6 +115,16 @@ export const TourPrograms: React.FC<TourProgramsProps> = ({ tours, onAddTour }) 
               <span>Daily Diary Builder</span>
             </button>
           </div>
+
+          {/* Excel .xls Exporter Button */}
+          <button
+            onClick={() => exportTourDiaryToExcel({ month: 8, year: 2026 })}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold shadow-sm transition-all active:scale-95"
+            title="Download Official Tour Diary Spreadsheet (.xls)"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
+            <span>Export tour_diary.xls</span>
+          </button>
 
           {viewMode === 'LIST' && (
             <button
