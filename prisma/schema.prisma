@@ -15,11 +15,11 @@ datasource db {
 // ==========================================
 
 enum UserRole {
-  EO_AO       // Enforcement Officer / Accounts Officer
-  APFC        // Assistant Provident Fund Commissioner
-  RPFC_II     // Regional Provident Fund Commissioner II
-  RPFC_I      // Regional Provident Fund Commissioner I
   ADMIN       // System Administrator
+  APFC        // Assistant Provident Fund Commissioner
+  EO          // Enforcement Officer / Accounts Officer
+  EO_AO       // Legacy EO/AO Alias
+  VIEWER      // Read-Only Auditor / Inspector Viewer
 }
 
 enum CoverageStatus {
@@ -134,7 +134,7 @@ model User {
   email          String          @unique
   name           String          // e.g. "Sri S.N. Behera"
   designation    String          // e.g. "Enforcement Officer (EO/AO)"
-  role           UserRole        @default(EO_AO)
+  role           UserRole        @default(EO)
   officeId       String?
   office         RegionalOffice? @relation(fields: [officeId], references: [id], onDelete: SetNull)
   createdAt      DateTime        @default(now())

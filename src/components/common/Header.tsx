@@ -1,7 +1,8 @@
 import React from 'react';
-import { Shield, Bell, Search, UserCheck } from 'lucide-react';
+import { Shield, Bell, Search, UserCheck, LogOut } from 'lucide-react';
 import { UserProfile } from '@/types';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface HeaderProps {
   user: UserProfile;
@@ -9,6 +10,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ user, activeTab }) => {
+  const { logout } = useAuth();
+
   return (
     <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border px-4 lg:px-8 py-3 transition-colors">
       <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto">
@@ -22,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab }) => {
               <span className="text-xs font-bold tracking-wider text-epfo-accent uppercase">EPFO Portal</span>
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span className="text-[10px] bg-epfo-navy/10 dark:bg-epfo-navy/40 text-epfo-navy dark:text-epfo-slate px-2 py-0.5 rounded-full font-medium">
-                Regional Office: {user.officeRegion}
+                {user.officeRegion}
               </span>
             </div>
             <h1 className="text-base font-bold capitalize text-foreground tracking-tight">
@@ -57,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab }) => {
           </button>
 
           {/* Officer Profile Badge */}
-          <div className="flex items-center gap-2.5 pl-3 border-l border-border">
+          <div className="flex items-center gap-2 pl-3 border-l border-border">
             <div className="w-8 h-8 rounded-full bg-epfo-navy text-white font-bold flex items-center justify-center text-xs ring-2 ring-epfo-accent/30 shadow-sm">
               {user.name.split(' ').map(n => n[0]).join('')}
             </div>
@@ -66,8 +69,22 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab }) => {
                 {user.name}
                 <UserCheck className="w-3 h-3 text-emerald-500" />
               </div>
-              <div className="text-[11px] text-muted-foreground">{user.designation}</div>
+              <div className="text-[10px] text-muted-foreground font-bold flex items-center gap-1">
+                <span className="px-1.5 py-0.2 rounded bg-epfo-accent/10 text-epfo-accent uppercase">
+                  {user.role}
+                </span>
+                <span>{user.designation}</span>
+              </div>
             </div>
+
+            {/* Logout Button */}
+            <button
+              onClick={logout}
+              title="Sign Out of Officer Session"
+              className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors ml-1"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>

@@ -1,16 +1,72 @@
 import React, { useState } from 'react';
 import { Shield, Lock, Mail, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/providers/AuthProvider';
+import { UserRole } from '@/types';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const handleRoleSelect = (role: UserRole) => {
+    const mockUsers: Record<string, any> = {
+      EO: {
+        id: 'eo-101',
+        pfStaffId: 'EPFO/EO/4502',
+        name: 'Shri Rajesh Sharma',
+        email: 'rajesh.sharma@epfindia.gov.in',
+        designation: 'Enforcement Officer (EO/AO)',
+        officeRegion: 'RO Mumbai (Bandra)',
+        role: 'EO',
+      },
+      EO_AO: {
+        id: 'eo-101',
+        pfStaffId: 'EPFO/EO/4502',
+        name: 'Shri Rajesh Sharma',
+        email: 'rajesh.sharma@epfindia.gov.in',
+        designation: 'Enforcement Officer (EO/AO)',
+        officeRegion: 'RO Mumbai (Bandra)',
+        role: 'EO',
+      },
+      APFC: {
+        id: 'apfc-201',
+        pfStaffId: 'EPFO/APFC/1104',
+        name: 'Smt. Anita Roy',
+        email: 'anita.roy@epfindia.gov.in',
+        designation: 'Assistant PF Commissioner (Compliance)',
+        officeRegion: 'RO Mumbai (Bandra)',
+        role: 'APFC',
+      },
+      ADMIN: {
+        id: 'admin-001',
+        pfStaffId: 'EPFO/ADM/0001',
+        name: 'System Administrator',
+        email: 'admin.portal@epfindia.gov.in',
+        designation: 'Portal Administrator',
+        officeRegion: 'Headquarters, New Delhi',
+        role: 'ADMIN',
+      },
+      VIEWER: {
+        id: 'viewer-301',
+        pfStaffId: 'EPFO/AUD/9901',
+        name: 'Auditor Inspection Viewer',
+        email: 'auditor.view@epfindia.gov.in',
+        designation: 'Audit & Vigilance Inspector',
+        officeRegion: 'RO Mumbai (Bandra)',
+        role: 'VIEWER',
+      },
+    };
+
+    const targetUser = mockUsers[role] || mockUsers.EO;
+    login(`jwt-token-${role.toLowerCase()}-${Date.now()}`, targetUser);
+    navigate('/');
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('auth_token', 'demo-token');
-    navigate('/');
+    handleRoleSelect('EO');
   };
 
   return (
@@ -21,7 +77,44 @@ export const Login: React.FC = () => {
             <Shield className="w-6 h-6 text-epfo-accent" />
           </div>
           <h2 className="text-xl font-bold text-foreground">EPFO Officer Portal</h2>
-          <p className="text-xs text-muted-foreground">Sign in with your official EPFO credentials</p>
+          <p className="text-xs text-muted-foreground">Sign in with official credentials or select role</p>
+        </div>
+
+        {/* Quick Demo Role Selector */}
+        <div className="p-3 rounded-xl bg-muted/40 border border-border space-y-2">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block text-center">
+            Demo Login by Officer Role
+          </span>
+          <div className="grid grid-cols-4 gap-1.5 text-xs font-bold">
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('EO')}
+              className="py-1.5 rounded-lg bg-epfo-navy/10 hover:bg-epfo-navy hover:text-white text-epfo-navy dark:text-epfo-slate transition-colors text-center"
+            >
+              EO
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('APFC')}
+              className="py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 hover:text-white text-emerald-600 dark:text-emerald-400 transition-colors text-center"
+            >
+              APFC
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('ADMIN')}
+              className="py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-600 hover:text-white text-purple-600 dark:text-purple-400 transition-colors text-center"
+            >
+              Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRoleSelect('VIEWER')}
+              className="py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-600 hover:text-white text-amber-600 dark:text-amber-400 transition-colors text-center"
+            >
+              Viewer
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">

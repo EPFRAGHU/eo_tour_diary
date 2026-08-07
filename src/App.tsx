@@ -5,24 +5,26 @@ import { TourPrograms } from '@/pages/TourPrograms';
 import { InspectionLogs } from '@/pages/InspectionLogs';
 import { Claims } from '@/pages/Claims';
 import { Reports } from '@/pages/Reports';
-import { UserProfile, TourProgramItem, InspectionLogItem, ClaimItem } from '@/types';
+import { TourProgramItem, InspectionLogItem, ClaimItem } from '@/types';
+import { useAuth } from '@/providers/AuthProvider';
 
 export function App() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const [user] = useState<UserProfile>({
+  const currentUser = user || {
     id: 'eo-101',
     name: 'Rajesh Sharma',
     email: 'rajesh.sharma@epfindia.gov.in',
     designation: 'Enforcement Officer (EO/AO)',
     officeRegion: 'RO Mumbai (Bandra)',
-    role: 'EO_AO',
-  });
+    role: 'EO' as const,
+  };
 
   const [tours, setTours] = useState<TourProgramItem[]>([
     {
       id: 'tour-1',
-      officerId: 'eo-101',
+      officerId: currentUser.id,
       title: 'Special Compliance Drive - Andheri East Zone',
       purpose: 'Inspection of 14B damages defaults & un-enrolled contract worker verification.',
       month: 8,
@@ -36,7 +38,7 @@ export function App() {
     },
     {
       id: 'tour-2',
-      officerId: 'eo-101',
+      officerId: currentUser.id,
       title: 'Routine Inspection Tour - MIDC Sector II',
       purpose: 'Verification of coverage eligibility for newly registered establishments under Sec 1(3)(b).',
       month: 8,
@@ -80,7 +82,7 @@ export function App() {
       id: 'claim-1',
       tourId: 'tour-1',
       tourTitle: 'Special Compliance Drive - Andheri East Zone',
-      officerId: 'eo-101',
+      officerId: currentUser.id,
       totalAmount: 3450,
       taAmount: 1200,
       daAmount: 1500,
@@ -119,10 +121,10 @@ export function App() {
   };
 
   return (
-    <Layout user={user} activeTab={activeTab} setActiveTab={setActiveTab}>
+    <Layout user={currentUser} activeTab={activeTab} setActiveTab={setActiveTab}>
       {activeTab === 'dashboard' && (
         <Dashboard
-          user={user}
+          user={currentUser}
           tours={tours}
           inspections={inspections}
           claims={claims}
@@ -143,7 +145,7 @@ export function App() {
         <Claims claims={claims} tours={tours} onAddClaim={handleAddClaim} />
       )}
       {activeTab === 'reports' && (
-        <Reports user={user} tours={tours} inspections={inspections} claims={claims} />
+        <Reports user={currentUser} tours={tours} inspections={inspections} claims={claims} />
       )}
     </Layout>
   );
