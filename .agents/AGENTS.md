@@ -1,0 +1,21 @@
+# EPFO EO Tour Diary - Project Rules
+
+- Never rewrite working code.
+- Never change architecture unless instructed.
+- Build one feature at a time.
+- Complete one phase before starting another.
+- Use reusable components.
+- Use TypeScript only.
+- Use React 19 + Vite.
+- Use TailwindCSS + shadcn/ui.
+- Use PostgreSQL + Prisma.
+- Keep files modular.
+- Use responsive layouts.
+- Mobile-first design.
+- Production-quality code only.
+- Add comments only where necessary.
+- Do not generate sample or fake data.
+- Do not leave TODOs.
+- Use proper folder structure.
+- Commit after every completed phase.
+- Ask before deleting any existing code.

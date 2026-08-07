@@ -1,0 +1,128 @@
+// Prisma Schema for EPFO EO Tour Diary
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EO_AO
+  APFC
+  RPFC
+  ADMIN
+}
+
+enum TourStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum InspectionStatus {
+  PENDING
+  CONDUCTED
+  DEFERRED
+  NON_COMPLIANT_FOUND
+}
+
+enum ClaimStatus {
+  DRAFT
+  SUBMITTED
+  VERIFIED_BY_APFC
+  APPROVED_BY_RPFC
+  REJECTED
+  DISBURSED
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String
+  designation  String
+  officeRegion String
+  role         Role          @default(EO_AO)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  tours        TourProgram[]
+  claims       Claim[]
+
+  @@map("users")
+}
+
+model TourProgram {
+  id           String          @id @default(uuid())
+  officerId    String
+  officer      User            @relation(fields: [officerId], references: [id], onDelete: Cascade)
+  title        String
+  purpose      String
+  month        Int
+  year         Int
+  startDate    DateTime
+  endDate      DateTime
+  status       TourStatus      @default(DRAFT)
+  remarks      String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  logs         InspectionLog[]
+  claims       Claim[]
+
+  @@map("tour_programs")
+}
+
+model InspectionLog {
+  id                String           @id @default(uuid())
+  tourId            String
+  tour              TourProgram      @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  date              DateTime
+  establishmentCode String
+  establishmentName String
+  location          String
+  inspectionPurpose String
+  observations      String
+  status            InspectionStatus @default(PENDING)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@map("inspection_logs")
+}
+
+model Claim {
+  id           String        @id @default(uuid())
+  tourId       String
+  tour         TourProgram   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  officerId    String
+  officer      User          @relation(fields: [officerId], references: [id], onDelete: Cascade)
+  totalAmount  Float
+  taAmount     Float
+  daAmount     Float
+  hotelAmount  Float         @default(0)
+  otherAmount  Float         @default(0)
+  status       ClaimStatus   @default(DRAFT)
+  remarks      String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  expenseItems ExpenseItem[]
+
+  @@map("claims")
+}
+
+model ExpenseItem {
+  id          String   @id @default(uuid())
+  claimId     String
+  claim       Claim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  date        DateTime
+  category    String
+  description String
+  amount      Float
+  receiptRef  String?
+  createdAt   DateTime @default(now())
+
+  @@map("expense_items")
+}

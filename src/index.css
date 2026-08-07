@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 215 30% 98%;
+    --foreground: 216 50% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 216 50% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 50% 10%;
+
+    --primary: 216 73% 16%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 216 73% 16%;
+
+    --muted: 214 32% 93%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 172 100% 33%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 90%;
+    --input: 214 32% 90%;
+    --ring: 216 73% 16%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 216 50% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 216 45% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 216 45% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 212 90% 55%;
+    --primary-foreground: 216 50% 7%;
+
+    --secondary: 215 25% 18%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 172 100% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 25% 20%;
+    --input: 215 25% 20%;
+    --ring: 212 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Glassmorphism & Custom Utility Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+}
