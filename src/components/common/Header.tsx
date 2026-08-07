@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Shield, Bell, Search, UserCheck, LogOut } from 'lucide-react';
+import { Shield, Bell, Search, UserCheck, LogOut, ShieldCheck } from 'lucide-react';
 import { UserProfile } from '@/types';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAuth } from '@/providers/AuthProvider';
 import { NotificationCenterModal } from '@/components/notifications/NotificationCenterModal';
+import { AuditLogViewerModal } from '@/components/security/AuditLogViewerModal';
 
 interface HeaderProps {
   user: UserProfile;
@@ -14,6 +15,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ user, activeTab, onNavigate }) => {
   const { logout } = useAuth();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border px-4 lg:px-8 py-3 transition-colors">
@@ -50,6 +52,16 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab, onNavigate }) =
         <div className="flex items-center gap-3">
           {/* Theme Switcher */}
           <ThemeSwitcher />
+
+          {/* Security Audit Trail Icon */}
+          <button
+            onClick={() => setIsAuditModalOpen(true)}
+            aria-label="Open Security Audit Logs"
+            title="Security Audit Logs & Activity Stream"
+            className="p-2 rounded-lg text-muted-foreground hover:text-epfo-accent hover:bg-muted transition-colors"
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+          </button>
 
           {/* Quick Search */}
           <div className="hidden md:flex items-center gap-2 bg-muted/60 hover:bg-muted transition-colors rounded-lg px-3 py-1.5 text-xs text-muted-foreground border border-border/50">
@@ -103,6 +115,12 @@ export const Header: React.FC<HeaderProps> = ({ user, activeTab, onNavigate }) =
         isOpen={isNotificationsOpen}
         onClose={() => setIsNotificationsOpen(false)}
         onNavigate={onNavigate}
+      />
+
+      {/* Security Audit Log Viewer Modal */}
+      <AuditLogViewerModal
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
       />
     </header>
   );
