@@ -11,7 +11,9 @@ import {
   ShieldAlert,
   Lock,
   Database,
-  Sliders
+  Sliders,
+  Trash2,
+  AlertOctagon
 } from 'lucide-react';
 import { ExtendedUserProfile, UserRole, UserStatus, TourProgramItem, DocumentRecord, RolePermissionsMap } from '@/types';
 import {
@@ -35,7 +37,8 @@ import { LoginSecurityModal } from '@/components/admin/LoginSecurityModal';
 import { RolesPermissionsView } from '@/components/admin/RolesPermissionsView';
 import { AuditLogsView } from '@/components/admin/AuditLogsView';
 import { EstablishmentMasterImportView } from '@/components/admin/EstablishmentMasterImportView';
-import { EstablishmentDTO } from '@/types';
+import { DataPurgeManagementModal } from '@/components/admin/DataPurgeManagementModal';
+import { EstablishmentDTO, InspectionLogItem, ClaimItem } from '@/types';
 
 export type SuperAdminSubTab =
   | 'users'
@@ -55,10 +58,13 @@ interface UserManagementProps {
   tours?: TourProgramItem[];
   documents?: DocumentRecord[];
   establishments?: EstablishmentDTO[];
+  inspections?: InspectionLogItem[];
+  claims?: ClaimItem[];
   onImportEstablishments?: (imported: Omit<EstablishmentDTO, 'id'>[]) => void;
   onAddEstablishment?: (est: Omit<EstablishmentDTO, 'id'>) => void;
   onUpdateEstablishment?: (est: EstablishmentDTO) => void;
   onDeleteEstablishment?: (id: string) => void;
+  onDataPurgeReset?: () => void;
   initialSubTab?: SuperAdminSubTab;
 }
 
@@ -67,10 +73,13 @@ export const UserManagement: React.FC<UserManagementProps> = ({
   tours = [],
   documents = [],
   establishments = [],
+  inspections = [],
+  claims = [],
   onImportEstablishments = () => {},
   onAddEstablishment,
   onUpdateEstablishment,
   onDeleteEstablishment,
+  onDataPurgeReset = () => {},
   initialSubTab = 'users',
 }) => {
   const [subTab, setSubTab] = useState<SuperAdminSubTab>(initialSubTab);
@@ -78,6 +87,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
   const [rbacMatrix, setRbacMatrix] = useState<RolePermissionsMap>(getRBACMatrixFromStorage());
   const [sessions, setSessions] = useState(getSessionsFromStorage());
   const [activityLogs] = useState(getUserActivityLogsFromStorage());
+  const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
 
   // Security & Backup states
   const [backupHistory, setBackupHistory] = useState([
@@ -424,28 +434,39 @@ export const UserManagement: React.FC<UserManagementProps> = ({
           </div>
         </div>
 
-        {subTab === 'users' && (
+        <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => {
-              setEditingUser(null);
-              setIsAddModalOpen(true);
-            }}
-            className="px-4 py-2.5 text-xs font-bold text-epfo-navy bg-epfo-accent hover:bg-amber-400 rounded-xl shadow-lg transition-all flex items-center gap-2 shrink-0"
+            onClick={() => setIsPurgeModalOpen(true)}
+            className="px-3.5 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg transition-all flex items-center gap-1.5 shrink-0 border border-red-500/30"
+            title="Remove all dummy data, clear incorrect entries & switch to clean live mode"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add New Official / User</span>
+            <Trash2 className="w-4 h-4 text-white" />
+            <span>Master Data Purge / Live Mode</span>
           </button>
-        )}
 
-        {subTab === 'backups' && (
-          <button
-            onClick={handleCreateBackup}
-            className="px-4 py-2.5 text-xs font-bold text-epfo-navy bg-epfo-accent hover:bg-amber-400 rounded-xl shadow-lg transition-all flex items-center gap-2 shrink-0"
-          >
-            <Database className="w-4 h-4" />
-            <span>Generate Backup Snapshot</span>
-          </button>
-        )}
+          {subTab === 'users' && (
+            <button
+              onClick={() => {
+                setEditingUser(null);
+                setIsAddModalOpen(true);
+              }}
+              className="px-4 py-2.5 text-xs font-bold text-epfo-navy bg-epfo-accent hover:bg-amber-400 rounded-xl shadow-lg transition-all flex items-center gap-2 shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Official / User</span>
+            </button>
+          )}
+
+          {subTab === 'backups' && (
+            <button
+              onClick={handleCreateBackup}
+              className="px-4 py-2.5 text-xs font-bold text-epfo-navy bg-epfo-accent hover:bg-amber-400 rounded-xl shadow-lg transition-all flex items-center gap-2 shrink-0"
+            >
+              <Database className="w-4 h-4" />
+              <span>Generate Backup Snapshot</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Navigation Sub-Menu Bar - Super Admin Administration Modules */}
@@ -754,6 +775,26 @@ export const UserManagement: React.FC<UserManagementProps> = ({
               </tbody>
             </table>
           </div>
+
+          {/* Master Data Purge & Clean Live Mode Card */}
+          <div className="p-5 rounded-2xl bg-red-500/5 border border-red-500/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold">
+                <AlertOctagon className="w-4 h-4" />
+                <span>Permanent Master Data Purge (Clean 0-Data Live Mode)</span>
+              </div>
+              <button
+                onClick={() => setIsPurgeModalOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Open Data Purge Center</span>
+              </button>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Delete all dummy establishments, monthly tour proposals, field inspection logs, and TA/DA bills across all user accounts to start with 100% clean production data.
+            </p>
+          </div>
         </div>
       )}
 
@@ -844,6 +885,23 @@ export const UserManagement: React.FC<UserManagementProps> = ({
         sessions={sessions}
         onTerminateSession={handleTerminateSession}
         onTerminateAllSessions={handleTerminateAllSessions}
+      />
+
+      <DataPurgeManagementModal
+        isOpen={isPurgeModalOpen}
+        onClose={() => setIsPurgeModalOpen(false)}
+        currentUser={currentUser}
+        counts={{
+          establishments: establishments.length,
+          tours: tours.length,
+          inspections: inspections.length,
+          claims: claims.length,
+          documents: documents.length,
+        }}
+        onDataReset={() => {
+          onDataPurgeReset();
+          showToast('success', 'Master data purged. Application is now running in 100% clean Live Mode.');
+        }}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileCheck2, Plus, MapPin, CheckCircle2, Clock, XCircle, Send, Table } from 'lucide-react';
+import { FileCheck2, Plus, MapPin, CheckCircle2, Clock, XCircle, Table, Trash2, Send } from 'lucide-react';
 import { InspectionLogItem, TourProgramItem } from '@/types';
 import { formatDate } from '@/lib/utils';
 import { EditableVisitTable } from '@/components/diary/EditableVisitTable';
@@ -8,12 +8,14 @@ interface InspectionLogsProps {
   inspections: InspectionLogItem[];
   tours: TourProgramItem[];
   onAddInspection: (inspection: Omit<InspectionLogItem, 'id'>) => void;
+  onDeleteInspection?: (id: string) => void;
 }
 
 export const InspectionLogs: React.FC<InspectionLogsProps> = ({
   inspections,
   tours,
   onAddInspection,
+  onDeleteInspection,
 }) => {
   const [viewMode, setViewMode] = useState<'TABLE' | 'CARDS'>('TABLE');
   const [showModal, setShowModal] = useState(false);
@@ -161,9 +163,25 @@ export const InspectionLogs: React.FC<InspectionLogsProps> = ({
                   <MapPin className="w-3.5 h-3.5 text-epfo-navy shrink-0" />
                   <span>{insp.location}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>{formatDate(insp.date || insp.visitDate || new Date())}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>{formatDate(insp.date || insp.visitDate || new Date())}</span>
+                  </div>
+
+                  {onDeleteInspection && (
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Delete inspection record for "${insp.establishmentName}"?`)) {
+                          onDeleteInspection(insp.id);
+                        }
+                      }}
+                      className="p-1 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-500/10 transition-colors ml-1"
+                      title="Delete Inspection Record"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

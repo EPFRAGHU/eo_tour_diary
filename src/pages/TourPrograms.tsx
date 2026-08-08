@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CalendarDays, Plus, MapPin, CheckCircle2, Clock, XCircle, Send, FileEdit, BookOpen, MessageSquare, FileSpreadsheet } from 'lucide-react';
+import { CalendarDays, Plus, MapPin, CheckCircle2, Clock, XCircle, FileEdit, BookOpen, MessageSquare, FileSpreadsheet, Trash2, Send } from 'lucide-react';
 import { TourProgramItem } from '@/types';
 import { formatDate } from '@/lib/utils';
 import { TourDiaryFormBuilder } from '@/components/diary/TourDiaryFormBuilder';
@@ -10,9 +10,11 @@ import { exportTourDiaryToExcel } from '@/lib/excelExport';
 interface TourProgramsProps {
   tours: TourProgramItem[];
   onAddTour: (tour: Omit<TourProgramItem, 'id' | 'createdAt'>) => void;
+  onDeleteTour?: (id: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export const TourPrograms: React.FC<TourProgramsProps> = ({ tours, onAddTour }) => {
+export const TourPrograms: React.FC<TourProgramsProps> = ({ tours, onAddTour, onDeleteTour }) => {
   const [viewMode, setViewMode] = useState<'LIST' | 'BUILDER'>('LIST');
   const [showModal, setShowModal] = useState(false);
   const [activeRemarksTourId, setActiveRemarksTourId] = useState<string | null>(null);
@@ -186,13 +188,29 @@ export const TourPrograms: React.FC<TourProgramsProps> = ({ tours, onAddTour }) 
                       <span>{formatDate(tour.startDate)} - {formatDate(tour.endDate)}</span>
                     </div>
 
-                    <button
-                      onClick={() => setActiveRemarksTourId(activeRemarksTourId === tour.id ? null : tour.id)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-epfo-navy/10 text-epfo-navy dark:text-epfo-slate font-bold hover:bg-epfo-navy hover:text-white transition-all text-[10px]"
-                    >
-                      <MessageSquare className="w-3 h-3 text-epfo-accent" />
-                      <span>Remarks System</span>
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setActiveRemarksTourId(activeRemarksTourId === tour.id ? null : tour.id)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-epfo-navy/10 text-epfo-navy dark:text-epfo-slate font-bold hover:bg-epfo-navy hover:text-white transition-all text-[10px]"
+                      >
+                        <MessageSquare className="w-3 h-3 text-epfo-accent" />
+                        <span>Remarks System</span>
+                      </button>
+
+                      {onDeleteTour && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Delete tour program "${tour.title}"?`)) {
+                              onDeleteTour(tour.id);
+                            }
+                          }}
+                          className="p-1 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-500/10 transition-colors"
+                          title="Delete Tour Record"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Remarks System Collapse */}

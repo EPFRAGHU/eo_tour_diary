@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Receipt, Plus, Clock, XCircle, FileText } from 'lucide-react';
+import { Receipt, Plus, Clock, XCircle, FileText, Trash2 } from 'lucide-react';
 import { ClaimItem, TourProgramItem } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
@@ -7,9 +7,10 @@ interface ClaimsProps {
   claims: ClaimItem[];
   tours: TourProgramItem[];
   onAddClaim: (claim: Omit<ClaimItem, 'id' | 'createdAt'>) => void;
+  onDeleteClaim?: (id: string) => void;
 }
 
-export const Claims: React.FC<ClaimsProps> = ({ claims, tours, onAddClaim }) => {
+export const Claims: React.FC<ClaimsProps> = ({ claims, tours, onAddClaim, onDeleteClaim }) => {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     tourId: tours[0]?.id || '',
@@ -126,7 +127,22 @@ export const Claims: React.FC<ClaimsProps> = ({ claims, tours, onAddClaim }) => 
 
               <div className="pt-2 border-t border-border/60 flex items-center justify-between">
                 <span className="text-xs font-bold text-muted-foreground">Total Claim Value</span>
-                <span className="text-base font-extrabold text-epfo-accent">{formatCurrency(claim.totalAmount)}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-base font-extrabold text-epfo-accent">{formatCurrency(claim.totalAmount)}</span>
+                  {onDeleteClaim && (
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Delete claim for "${claim.tourTitle}"?`)) {
+                          onDeleteClaim(claim.id);
+                        }
+                      }}
+                      className="p-1 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-500/10 transition-colors"
+                      title="Delete Claim Record"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

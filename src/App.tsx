@@ -14,8 +14,17 @@ import { UserManagement } from '@/pages/admin/UserManagement';
 import { TourProgramItem, InspectionLogItem, ClaimItem, EstablishmentDTO } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { SUPER_ADMIN_EMAIL, isProtectedSuperAdmin } from '@/lib/securityUtils';
-
 import { formatOdishaEstCode } from '@/lib/utils';
+import {
+  getLiveEstablishments,
+  saveLiveEstablishments,
+  getLiveTours,
+  saveLiveTours,
+  getLiveInspections,
+  saveLiveInspections,
+  getLiveClaims,
+  saveLiveClaims,
+} from '@/lib/appStorage';
 
 export function App({ initialTab }: { initialTab?: string }) {
   const { user } = useAuth();
@@ -50,112 +59,19 @@ export function App({ initialTab }: { initialTab?: string }) {
   // Guard activeTab if non-super admin attempts to view an admin tab
   const effectiveTab = (!isSuperAdmin && adminTabKeys.includes(activeTab)) ? 'dashboard' : activeTab;
 
-  const [establishments, setEstablishments] = useState<EstablishmentDTO[]>([
-    {
-      id: 'est-1',
-      establishmentCode: 'OR/BBS/0006276/000',
-      name: 'M/s Jindal Stainless Steel Ltd',
-      location: 'Danagadi, Jajpur',
-      district: 'Jajpur',
-      coverageStatus: 'COVERED',
-      industryType: 'Manufacturing / Metallurgy',
-    },
-    {
-      id: 'est-2',
-      establishmentCode: 'OR/BBS/0001238/000',
-      name: 'M/s Bhimtanagar Sukinda Chromite Mines',
-      location: 'Sukinda, Jajpur',
-      district: 'Jajpur',
-      coverageStatus: 'EXEMPTED',
-      industryType: 'Mining & Extraction',
-    },
-    {
-      id: 'est-3',
-      establishmentCode: 'OR/BBS/0005077/000',
-      name: 'M/s NTPC Kanhia Thermal Power Plant',
-      location: 'Kanhia, Angul',
-      district: 'Angul',
-      coverageStatus: 'COVERED',
-      industryType: 'Power Generation',
-    },
-    {
-      id: 'est-4',
-      establishmentCode: 'OR/BBS/0016917/024',
-      name: 'M/s Executive Engineer, Mahanadi South Division',
-      location: 'Cuttack',
-      district: 'Cuttack',
-      coverageStatus: 'GOVT_UNDERTAKING',
-      industryType: 'Public Works / Irrigation',
-    },
-    {
-      id: 'est-5',
-      establishmentCode: 'OR/BBS/0045231/000',
-      name: 'Apex Logistics & Freight India Pvt Ltd',
-      location: 'Choudwar Industrial Area, Cuttack',
-      district: 'Cuttack',
-      coverageStatus: 'COVERED',
-      industryType: 'Logistics & Supply Chain',
-    },
-  ]);
+  // Live Persistent State
+  const [establishments, setEstablishments] = useState<EstablishmentDTO[]>(() => getLiveEstablishments());
+  const [tours, setTours] = useState<TourProgramItem[]>(() => getLiveTours());
+  const [inspections, setInspections] = useState<InspectionLogItem[]>(() => getLiveInspections());
+  const [claims, setClaims] = useState<ClaimItem[]>(() => getLiveClaims());
 
-  const [tours, setTours] = useState<TourProgramItem[]>([
-    {
-      id: 'tour-1',
-      officerId: currentUser.id,
-      month: 8,
-      year: 2026,
-      title: 'Monsoon Compliance Drive & 7A Quasi-Judicial Inquiries',
-      purpose: 'Verification of 14B damages defaults & un-enrolled contract worker verification across Jajpur industrial cluster.',
-      startDate: '2026-08-10',
-      endDate: '2026-08-28',
-      status: 'APPROVED',
-      remarks: 'APFC approved for 8 major establishment visits',
-      inspectionsCount: 4,
-      createdAt: '2026-08-01',
-    },
-  ]);
-
-  const [inspections, setInspections] = useState<InspectionLogItem[]>([
-    {
-      id: 'insp-1',
-      tourId: 'tour-1',
-      date: '2026-08-10',
-      establishmentCode: 'OR/BBS/0045231/000',
-      establishmentName: 'Apex Logistics & Freight India Pvt Ltd',
-      location: 'Choudwar Industrial Area, Cuttack',
-      inspectionPurpose: 'Section 7A Enquiry Records Examination',
-      observations: 'Examined attendance registers and salary slips for May-July 2026. Detected 18 non-enrolled contractual security staff. Issued Form 11 notice.',
-      status: 'NON_COMPLIANT_FOUND',
-    },
-    {
-      id: 'insp-2',
-      tourId: 'tour-1',
-      date: '2026-08-12',
-      establishmentCode: 'OR/BBS/0006276/000',
-      establishmentName: 'M/s Jindal Stainless Steel Ltd',
-      location: 'Danagadi, Jajpur',
-      inspectionPurpose: 'PMVBRY Campaigning & Verification',
-      observations: 'Inspected 14B damages compliance and conducted labor code awareness camp.',
-      status: 'CONDUCTED',
-    },
-  ]);
-
-  const [claims, setClaims] = useState<ClaimItem[]>([
-    {
-      id: 'claim-1',
-      tourId: 'tour-1',
-      tourTitle: 'Special Compliance Drive - Jajpur Industrial Cluster',
-      officerId: currentUser.id,
-      totalAmount: 3450,
-      taAmount: 1200,
-      daAmount: 1500,
-      hotelAmount: 750,
-      otherAmount: 0,
-      status: 'SUBMITTED',
-      remarks: 'Taxi vouchers & DA rate per grade IV attached.',
-      createdAt: '2026-08-06',
-    },
-  ]);
+  // Synchronize state with persistent storage on reloads or storage events
+  const handleReloadLiveStorage = () => {
+    setEstablishments(getLiveEstablishments());
+    setTours(getLiveTours());
+    setInspections(getLiveInspections());
+    setClaims(getLiveClaims());
+  };
 
   // Establishment Actions
   const handleAddEstablishment = (newEst: Omit<EstablishmentDTO, 'id'>) => {
@@ -164,7 +80,9 @@ export function App({ initialTab }: { initialTab?: string }) {
       establishmentCode: formatOdishaEstCode(newEst.establishmentCode, newEst.district),
       id: `est-${Date.now()}`,
     };
-    setEstablishments([item, ...establishments]);
+    const updated = [item, ...establishments];
+    setEstablishments(updated);
+    saveLiveEstablishments(updated);
   };
 
   const handleUpdateEstablishment = (updatedEst: EstablishmentDTO) => {
@@ -172,11 +90,15 @@ export function App({ initialTab }: { initialTab?: string }) {
       ...updatedEst,
       establishmentCode: formatOdishaEstCode(updatedEst.establishmentCode, updatedEst.district),
     };
-    setEstablishments(establishments.map((e) => (e.id === formatted.id ? formatted : e)));
+    const updated = establishments.map((e) => (e.id === formatted.id ? formatted : e));
+    setEstablishments(updated);
+    saveLiveEstablishments(updated);
   };
 
   const handleDeleteEstablishment = (id: string) => {
-    setEstablishments(establishments.filter((e) => e.id !== id));
+    const updated = establishments.filter((e) => e.id !== id);
+    setEstablishments(updated);
+    saveLiveEstablishments(updated);
   };
 
   const handleImportEstablishments = (imported: Omit<EstablishmentDTO, 'id'>[]) => {
@@ -185,33 +107,62 @@ export function App({ initialTab }: { initialTab?: string }) {
       establishmentCode: formatOdishaEstCode(item.establishmentCode, item.district),
       id: `est-imp-${Date.now()}-${idx}`,
     }));
-    setEstablishments([...newItems, ...establishments]);
+    const updated = [...newItems, ...establishments];
+    setEstablishments(updated);
+    saveLiveEstablishments(updated);
   };
 
+  // Tour Actions
   const handleAddTour = (newTour: Omit<TourProgramItem, 'id' | 'createdAt'>) => {
     const item: TourProgramItem = {
       ...newTour,
       id: `tour-${Date.now()}`,
       createdAt: new Date().toISOString().split('T')[0],
     };
-    setTours([item, ...tours]);
+    const updated = [item, ...tours];
+    setTours(updated);
+    saveLiveTours(updated);
   };
 
+  const handleDeleteTour = (id: string) => {
+    const updated = tours.filter((t) => t.id !== id);
+    setTours(updated);
+    saveLiveTours(updated);
+  };
+
+  // Inspection Actions
   const handleAddInspection = (newInsp: Omit<InspectionLogItem, 'id'>) => {
     const item: InspectionLogItem = {
       ...newInsp,
       id: `insp-${Date.now()}`,
     };
-    setInspections([item, ...inspections]);
+    const updated = [item, ...inspections];
+    setInspections(updated);
+    saveLiveInspections(updated);
   };
 
+  const handleDeleteInspection = (id: string) => {
+    const updated = inspections.filter((i) => i.id !== id);
+    setInspections(updated);
+    saveLiveInspections(updated);
+  };
+
+  // Claim Actions
   const handleAddClaim = (newClaim: Omit<ClaimItem, 'id' | 'createdAt'>) => {
     const item: ClaimItem = {
       ...newClaim,
       id: `claim-${Date.now()}`,
       createdAt: new Date().toISOString().split('T')[0],
     };
-    setClaims([item, ...claims]);
+    const updated = [item, ...claims];
+    setClaims(updated);
+    saveLiveClaims(updated);
+  };
+
+  const handleDeleteClaim = (id: string) => {
+    const updated = claims.filter((c) => c.id !== id);
+    setClaims(updated);
+    saveLiveClaims(updated);
   };
 
   return (
@@ -233,13 +184,19 @@ export function App({ initialTab }: { initialTab?: string }) {
         />
       )}
       {effectiveTab === 'tours' && (
-        <TourPrograms tours={tours} onAddTour={handleAddTour} />
+        <TourPrograms
+          tours={tours}
+          onAddTour={handleAddTour}
+          onDeleteTour={handleDeleteTour}
+          isSuperAdmin={isSuperAdmin}
+        />
       )}
       {effectiveTab === 'inspections' && (
         <InspectionLogs
           inspections={inspections}
           tours={tours}
           onAddInspection={handleAddInspection}
+          onDeleteInspection={handleDeleteInspection}
         />
       )}
       {effectiveTab === 'followups' && (
@@ -262,7 +219,12 @@ export function App({ initialTab }: { initialTab?: string }) {
         <CommunicationHub establishments={establishments} />
       )}
       {effectiveTab === 'claims' && (
-        <Claims claims={claims} tours={tours} onAddClaim={handleAddClaim} />
+        <Claims
+          claims={claims}
+          tours={tours}
+          onAddClaim={handleAddClaim}
+          onDeleteClaim={handleDeleteClaim}
+        />
       )}
       {effectiveTab === 'reports' && (
         <Reports user={currentUser} tours={tours} inspections={inspections} claims={claims} />
@@ -272,10 +234,13 @@ export function App({ initialTab }: { initialTab?: string }) {
           currentUser={currentUser}
           tours={tours}
           establishments={establishments}
+          inspections={inspections}
+          claims={claims}
           onImportEstablishments={handleImportEstablishments}
           onAddEstablishment={handleAddEstablishment}
           onUpdateEstablishment={handleUpdateEstablishment}
           onDeleteEstablishment={handleDeleteEstablishment}
+          onDataPurgeReset={handleReloadLiveStorage}
           initialSubTab={
             effectiveTab === 'roles' ? 'roles' :
             effectiveTab === 'offices' || effectiveTab === 'departments' || effectiveTab === 'districts' ? 'offices' :
