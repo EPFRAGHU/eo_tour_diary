@@ -114,7 +114,7 @@ model RegionalOffice {
 
 model Establishment {
   id                String            @id @default(uuid())
-  establishmentCode String            @unique // e.g. "OR/6276", "OR/BBS/1238"
+  establishmentCode String            @unique // e.g. "OR/BBS/0000000/000", "OR/BBS/0006276/000"
   name              String
   location          String
   district          String

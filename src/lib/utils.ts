@@ -36,22 +36,30 @@ export function isOdishaDistrict(district?: string): boolean {
   return ODISHA_DISTRICTS.some(d => normalized.includes(d.toLowerCase()));
 }
 
-export function formatOdishaEstCode(code: string, district?: string): string {
-  if (!code) return '';
-  const trimmed = code.trim();
-  if (isOdishaDistrict(district)) {
-    if (trimmed.toUpperCase().startsWith('OR/BBS/') || trimmed.toUpperCase().startsWith('ORBBS/')) {
-      return trimmed.toUpperCase();
-    }
-    if (trimmed.toUpperCase().startsWith('OR/')) {
-      return trimmed.toUpperCase().replace(/^OR\//i, 'OR/BBS/');
-    }
-    if (trimmed.toUpperCase().startsWith('ORBBS')) {
-      return `OR/BBS/${trimmed.substring(5).replace(/^\//, '')}`;
-    }
-    if (!trimmed.includes('/')) {
-      return `OR/BBS/${trimmed}`;
-    }
+export function formatOdishaEstCode(code: string, _district?: string): string {
+  if (!code || !code.trim()) return 'OR/BBS/0000000/000';
+  let cleaned = code.trim().toUpperCase();
+
+  // Strip existing prefix if present
+  cleaned = cleaned.replace(/^OR\/BBS\//i, '').replace(/^ORBBS\//i, '').replace(/^OR\//i, '').replace(/^ORBBS/i, '');
+
+  const parts = cleaned.split('/').map((p) => p.trim());
+  let mainPart = parts[0] || '0000000';
+  let extPart = parts.length > 1 ? parts[1] : '000';
+
+  // Format main establishment ID (padded to 7 digits)
+  if (/^\d+$/.test(mainPart)) {
+    mainPart = mainPart.padStart(7, '0');
+  } else if (!mainPart) {
+    mainPart = '0000000';
   }
-  return trimmed;
+
+  // Format extension / sub-code (padded to 3 digits)
+  if (/^\d+$/.test(extPart)) {
+    extPart = extPart.padStart(3, '0');
+  } else if (!extPart) {
+    extPart = '000';
+  }
+
+  return `OR/BBS/${mainPart}/${extPart}`;
 }

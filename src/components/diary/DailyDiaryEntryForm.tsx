@@ -3,6 +3,7 @@ import { Trash2, ChevronDown, ChevronUp, MapPin, Building2, Car, Camera, Navigat
 import { DayType } from '@/types';
 import { getCurrentGPSLocation } from '@/lib/gpsUtils';
 import { CameraUploadModal } from '@/components/mobile/CameraUploadModal';
+import { formatOdishaEstCode } from '@/lib/utils';
 
 export interface DailyVisitEntry {
   id: string;
@@ -202,9 +203,14 @@ export const DailyDiaryEntryForm: React.FC<DailyDiaryEntryFormProps> = ({
               <label className="font-bold text-foreground">Estt Code / Reg *</label>
               <input
                 type="text"
-                placeholder="e.g., OR/BBS/6276"
+                placeholder="e.g., OR/BBS/0000000/000"
                 value={entry.establishmentCode}
                 onChange={(e) => handleChange('establishmentCode', e.target.value)}
+                onBlur={(e) => {
+                  if (e.target.value.trim()) {
+                    handleChange('establishmentCode', formatOdishaEstCode(e.target.value));
+                  }
+                }}
                 className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none font-mono uppercase"
               />
             </div>

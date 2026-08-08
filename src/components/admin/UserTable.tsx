@@ -520,14 +520,41 @@ export const UserTable: React.FC<UserTableProps> = ({
 
                       {visibleColumns.status && (
                         <td className="p-3.5">
-                          <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
-                            user.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
-                            user.status === 'LOCKED' ? 'bg-red-500/10 text-red-500' :
-                            user.status === 'SUSPENDED' ? 'bg-amber-500/10 text-amber-600' :
-                            'bg-slate-500/10 text-slate-500'
-                          }`}>
-                            {user.status}
-                          </span>
+                          {isSuperAdmin ? (
+                            <span
+                              className="px-2.5 py-1 text-[10px] font-black rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 inline-flex items-center gap-1"
+                              title="Super Admin account status is permanently protected and active"
+                            >
+                              <Shield className="w-3 h-3 text-epfo-accent" />
+                              ACTIVE
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => onToggleStatus(user, user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')}
+                              className={`px-2.5 py-1 text-[10px] font-bold rounded-full border transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-105 active:scale-95 ${
+                                user.status === 'ACTIVE'
+                                  ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                                  : user.status === 'LOCKED'
+                                  ? 'bg-red-500/10 hover:bg-red-500/20 text-red-500 border-red-500/30'
+                                  : user.status === 'SUSPENDED'
+                                  ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 border-amber-500/30'
+                                  : 'bg-slate-500/10 hover:bg-slate-500/20 text-slate-500 border-slate-500/30'
+                              }`}
+                              title={
+                                user.status === 'ACTIVE'
+                                  ? 'Click to Disable / Deactivate this account'
+                                  : 'Click to Enable / Activate this account'
+                              }
+                            >
+                              {user.status === 'ACTIVE' ? (
+                                <UserCheck className="w-3 h-3 text-emerald-500" />
+                              ) : (
+                                <UserX className="w-3 h-3 text-amber-500" />
+                              )}
+                              <span>{user.status}</span>
+                            </button>
+                          )}
                         </td>
                       )}
 
@@ -537,36 +564,80 @@ export const UserTable: React.FC<UserTableProps> = ({
                         </td>
                       )}
 
-                      {/* Row Action Trigger Menu */}
+                      {/* Row Action Buttons */}
                       <td className="p-3.5 text-right relative">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {/* 1. Quick Edit Button */}
                           <button
-                            onClick={() => onViewUser(user)}
-                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                            title="View User Details"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </button>
-
-                          <button
+                            type="button"
                             onClick={() => onEditUser(user)}
-                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                            title="Edit User"
+                            className="p-1.5 rounded-lg border border-border/80 bg-background hover:bg-epfo-navy hover:text-white dark:hover:bg-epfo-accent dark:hover:text-epfo-navy text-muted-foreground transition-all shadow-xs"
+                            title="Edit User Profile (Name, Role, Office, Email, Mobile)"
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
 
+                          {/* 2. Quick Enable / Disable Status Toggle */}
+                          {!isSuperAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => onToggleStatus(user, user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')}
+                              className={`p-1.5 rounded-lg border transition-all shadow-xs ${
+                                user.status === 'ACTIVE'
+                                  ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white'
+                                  : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white'
+                              }`}
+                              title={user.status === 'ACTIVE' ? 'Disable / Deactivate User' : 'Enable / Activate User'}
+                            >
+                              {user.status === 'ACTIVE' ? (
+                                <UserX className="w-3.5 h-3.5" />
+                              ) : (
+                                <UserCheck className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          )}
+
+                          {/* 3. Password & Security Reset Button */}
                           <button
+                            type="button"
                             onClick={() => onResetPassword(user)}
-                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                            title="Password & Security"
+                            className="p-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white transition-all shadow-xs"
+                            title="Password Reset & Security Credentials"
                           >
-                            <KeyRound className="w-3.5 h-3.5 text-amber-500" />
+                            <KeyRound className="w-3.5 h-3.5" />
                           </button>
 
+                          {/* 4. Delete User Button */}
                           <button
+                            type="button"
+                            disabled={isSuperAdmin}
+                            onClick={() => onDeleteUser(user)}
+                            className="p-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={
+                              isSuperAdmin
+                                ? 'Super Admin account cannot be deleted'
+                                : 'Permanently Delete User Account'
+                            }
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+
+                          {/* 5. View Full Profile Modal */}
+                          <button
+                            type="button"
+                            onClick={() => onViewUser(user)}
+                            className="p-1.5 rounded-lg border border-border/80 bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-xs"
+                            title="View Full Officer Profile"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+
+                          {/* 6. More Actions Dropdown */}
+                          <button
+                            type="button"
                             onClick={() => setOpenActionMenuId(openActionMenuId === user.id ? null : user.id)}
-                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                            className="p-1.5 rounded-lg border border-border/80 bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-xs"
+                            title="More Administration Options"
                           >
                             <MoreVertical className="w-3.5 h-3.5" />
                           </button>
@@ -575,9 +646,17 @@ export const UserTable: React.FC<UserTableProps> = ({
                         {/* Dropdown Action Popup */}
                         {openActionMenuId === user.id && (
                           <div
-                            className="absolute right-3 top-10 z-40 w-48 bg-card border border-border rounded-xl shadow-xl p-1 text-xs space-y-0.5 text-left animate-in fade-in duration-100"
+                            className="absolute right-3 top-10 z-40 w-52 bg-card border border-border rounded-xl shadow-2xl p-1 text-xs space-y-0.5 text-left animate-in fade-in duration-100"
                             onClick={() => setOpenActionMenuId(null)}
                           >
+                            <button
+                              onClick={() => onEditUser(user)}
+                              className="w-full px-3 py-1.5 rounded-lg hover:bg-muted flex items-center gap-2 font-medium text-foreground"
+                            >
+                              <Edit className="w-3.5 h-3.5 text-epfo-navy dark:text-epfo-accent" />
+                              <span>Edit Officer Details</span>
+                            </button>
+
                             <button
                               onClick={() => onViewActivity(user)}
                               className="w-full px-3 py-1.5 rounded-lg hover:bg-muted flex items-center gap-2 font-medium"
@@ -591,37 +670,47 @@ export const UserTable: React.FC<UserTableProps> = ({
                               className="w-full px-3 py-1.5 rounded-lg hover:bg-muted flex items-center gap-2 font-medium"
                             >
                               <Lock className="w-3.5 h-3.5 text-purple-500" />
-                              <span>View Login Security</span>
+                              <span>View Login Security History</span>
                             </button>
 
-                            {user.status === 'ACTIVE' ? (
+                            <button
+                              onClick={() => onResetPassword(user)}
+                              className="w-full px-3 py-1.5 rounded-lg hover:bg-muted flex items-center gap-2 font-medium text-amber-600"
+                            >
+                              <KeyRound className="w-3.5 h-3.5" />
+                              <span>Change / Reset Password</span>
+                            </button>
+
+                            {!isSuperAdmin && (
                               <button
-                                disabled={isSuperAdmin}
-                                onClick={() => onToggleStatus(user, 'INACTIVE')}
-                                className="w-full px-3 py-1.5 rounded-lg hover:bg-muted text-amber-600 dark:text-amber-400 flex items-center gap-2 font-medium disabled:opacity-40"
+                                onClick={() => onToggleStatus(user, user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')}
+                                className={`w-full px-3 py-1.5 rounded-lg hover:bg-muted flex items-center gap-2 font-medium ${
+                                  user.status === 'ACTIVE' ? 'text-amber-600' : 'text-emerald-600'
+                                }`}
                               >
-                                <UserX className="w-3.5 h-3.5" />
-                                <span>Deactivate User</span>
-                              </button>
-                            ) : (
-                              <button
-                                disabled={isSuperAdmin}
-                                onClick={() => onToggleStatus(user, 'ACTIVE')}
-                                className="w-full px-3 py-1.5 rounded-lg hover:bg-muted text-emerald-600 dark:text-emerald-400 flex items-center gap-2 font-medium disabled:opacity-40"
-                              >
-                                <UserCheck className="w-3.5 h-3.5" />
-                                <span>Activate User</span>
+                                {user.status === 'ACTIVE' ? (
+                                  <>
+                                    <UserX className="w-3.5 h-3.5" />
+                                    <span>Disable User (Set Inactive)</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <UserCheck className="w-3.5 h-3.5" />
+                                    <span>Enable User (Set Active)</span>
+                                  </>
+                                )}
                               </button>
                             )}
 
-                            <button
-                              disabled={isSuperAdmin}
-                              onClick={() => onDeleteUser(user)}
-                              className="w-full px-3 py-1.5 rounded-lg hover:bg-red-500/10 text-red-500 flex items-center gap-2 font-medium disabled:opacity-40"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              <span>Delete Record</span>
-                            </button>
+                            {!isSuperAdmin && (
+                              <button
+                                onClick={() => onDeleteUser(user)}
+                                className="w-full px-3 py-1.5 rounded-lg hover:bg-red-500/10 text-red-500 flex items-center gap-2 font-medium"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Delete User Account</span>
+                              </button>
+                            )}
                           </div>
                         )}
                       </td>

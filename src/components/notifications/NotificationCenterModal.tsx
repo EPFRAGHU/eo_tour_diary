@@ -49,12 +49,12 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
     {
       id: 'n-1',
       title: 'Pending Site Visit Scheduled Today',
-      message: 'Field visit scheduled for M/s Bharat Security & Allied Services (OR/BBS/6019). Form 11 notice verification due.',
+      message: 'Field visit scheduled for M/s Bharat Security & Allied Services (OR/BBS/0006019/000). Form 11 notice verification due.',
       type: 'PENDING_VISIT',
       timestamp: new Date().toISOString(),
       isRead: false,
       targetTab: 'tours',
-      esttCode: 'OR/BBS/6019',
+      esttCode: 'OR/BBS/0006019/000',
     },
     {
       id: 'n-2',
@@ -69,12 +69,12 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
     {
       id: 'n-3',
       title: 'Upcoming Section 7A Enquiry Due Date',
-      message: 'Section 7A dues hearing reminder for M/s Bhimtanagar Sukinda Chromite Mines (OR/BBS/1238) due in 3 days.',
+      message: 'Section 7A dues hearing reminder for M/s Bhimtanagar Sukinda Chromite Mines (OR/BBS/0001238/000) due in 3 days.',
       type: 'UPCOMING_FOLLOWUP',
       timestamp: '2026-08-05',
       isRead: false,
       targetTab: 'followups',
-      esttCode: 'OR/BBS/1238',
+      esttCode: 'OR/BBS/0001238/000',
     },
     {
       id: 'n-4',

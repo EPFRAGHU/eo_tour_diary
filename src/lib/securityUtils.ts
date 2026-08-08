@@ -118,16 +118,108 @@ export const SUPER_ADMIN_EMAIL = 'raghunatha.maharana@gmail.com';
 /**
  * Checks if the email belongs to the protected Super Admin.
  */
-export const isSuperAdminEmail = (email: string): boolean => {
-  return email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+export const isSuperAdminEmail = (email?: string | null): boolean => {
+  if (!email) return false;
+  return email.trim().toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
 };
 
 /**
  * Checks if a user is the protected Super Admin account.
  */
-export const isProtectedSuperAdmin = (user: { email: string; role?: UserRole }): boolean => {
+export const isProtectedSuperAdmin = (user?: { email?: string; role?: UserRole } | null): boolean => {
   if (!user) return false;
-  return isSuperAdminEmail(user.email) || user.role === 'SUPER_ADMIN';
+  if (user.email && isSuperAdminEmail(user.email)) return true;
+  return user.role === 'SUPER_ADMIN';
+};
+
+/**
+ * Super Admin Authorization Middleware Guard for API & View Handlers.
+ * Throws an error or returns false if user is not authorized.
+ */
+export const checkAdminAccess = (
+  user?: { email?: string; role?: UserRole; name?: string } | null,
+  resourceName: string = 'Administration Module'
+): { isAllowed: boolean; status: number; message: string } => {
+  if (!user) {
+    logAuditAction(
+      'Anonymous',
+      'READ_ONLY',
+      'ADMIN_ACCESS_DENIED',
+      resourceName,
+      `Unauthenticated access attempt to ${resourceName} blocked.`,
+      'BLOCKED'
+    );
+    return {
+      isAllowed: false,
+      status: 401,
+      message: 'Authentication required to access Administration section.',
+    };
+  }
+
+  if (!isProtectedSuperAdmin(user)) {
+    logAuditAction(
+      user.name || user.email || 'Unknown User',
+      user.role || 'READ_ONLY',
+      'ADMIN_ACCESS_DENIED',
+      resourceName,
+      `Unauthorized administration access attempt to ${resourceName} rejected. User role: ${user.role}.`,
+      'BLOCKED'
+    );
+    return {
+      isAllowed: false,
+      status: 403,
+      message: 'Access Denied: Administration section is restricted to Super Admin only.',
+    };
+  }
+
+  return {
+    isAllowed: true,
+    status: 200,
+    message: 'Access Granted: Super Admin clearance verified.',
+  };
+};
+
+/**
+ * Server-side / Interceptor Guard: requireSuperAdmin()
+ */
+export const requireSuperAdmin = (
+  user?: { email?: string; role?: UserRole; name?: string } | null,
+  actionName: string = 'API Administration'
+): boolean => {
+  const result = checkAdminAccess(user, actionName);
+  if (!result.isAllowed) {
+    const error: any = new Error(result.message);
+    error.status = result.status;
+    error.statusCode = result.status;
+    throw error;
+  }
+  return true;
+};
+
+/**
+ * Guards against deleting the Super Admin account
+ */
+export const canDeleteUser = (targetUser: { email?: string; role?: UserRole }): { allowed: boolean; reason?: string } => {
+  if (isProtectedSuperAdmin(targetUser)) {
+    return {
+      allowed: false,
+      reason: 'Protected Super Admin account cannot be deleted.',
+    };
+  }
+  return { allowed: true };
+};
+
+/**
+ * Guards against modifying the Super Admin status or role
+ */
+export const canModifyUserRoleOrStatus = (targetUser: { email?: string; role?: UserRole }): { allowed: boolean; reason?: string } => {
+  if (isProtectedSuperAdmin(targetUser)) {
+    return {
+      allowed: false,
+      reason: 'Protected Super Admin account status and role cannot be altered.',
+    };
+  }
+  return { allowed: true };
 };
 
 /**
@@ -197,10 +289,10 @@ export const logAuditAction = (
       action,
       resourceTarget,
       details: sanitizeInput(details),
-      ipAddress: '192.168.1.153 (RO Bhubaneswar Session)',
+      ipAddress: '192.168.1.153 (RO Bhubaneswar)',
       status,
     };
-    const updated = [entry, ...existing.slice(0, 99)]; // Keep latest 100 logs
+    const updated = [entry, ...existing.slice(0, 199)]; // Keep latest 200 logs
     setAuditItem(AUDIT_LOG_KEY, JSON.stringify(updated));
   } catch (e) {
     console.error('Failed to log security audit action:', e);
@@ -214,7 +306,7 @@ export const getAuditLogs = (): AuditLogEntry[] => {
   try {
     const raw = getAuditItem(AUDIT_LOG_KEY);
     if (!raw) {
-      // Return sample baseline logs
+      // Return baseline logs
       return [
         {
           id: 'audit-baseline-1',
@@ -231,10 +323,10 @@ export const getAuditLogs = (): AuditLogEntry[] => {
           id: 'audit-baseline-2',
           timestamp: new Date(Date.now() - 3600000).toISOString(),
           actorName: 'APFC (Compliance)',
-          actorRole: 'APFC',
+          actorRole: 'ASSISTANT_PF_COMMISSIONER',
           action: 'TOUR_APPROVE',
           resourceTarget: 'Tour Ref #tour-1',
-          details: 'Approved Tour Schedule: Special Compliance Drive - Andheri East Zone.',
+          details: 'Approved Tour Schedule: Special Compliance Drive - Jajpur Industrial Zone.',
           ipAddress: '192.168.1.100',
           status: 'SUCCESS',
         },

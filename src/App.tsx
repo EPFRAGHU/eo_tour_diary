@@ -13,13 +13,13 @@ import { Reports } from '@/pages/Reports';
 import { UserManagement } from '@/pages/admin/UserManagement';
 import { TourProgramItem, InspectionLogItem, ClaimItem, EstablishmentDTO } from '@/types';
 import { useAuth } from '@/providers/AuthProvider';
-import { SUPER_ADMIN_EMAIL } from '@/lib/securityUtils';
+import { SUPER_ADMIN_EMAIL, isProtectedSuperAdmin } from '@/lib/securityUtils';
 
 import { formatOdishaEstCode } from '@/lib/utils';
 
-export function App() {
+export function App({ initialTab }: { initialTab?: string }) {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(initialTab || 'dashboard');
 
   const currentUser = user || {
     id: 'usr-super-admin-1',
@@ -31,10 +31,16 @@ export function App() {
     role: 'SUPER_ADMIN' as const,
   };
 
+  const isSuperAdmin = isProtectedSuperAdmin(currentUser);
+  const adminTabKeys = ['users', 'roles', 'offices', 'departments', 'districts', 'audit-logs', 'settings', 'security', 'backups', 'config'];
+
+  // Guard activeTab if non-super admin attempts to view an admin tab
+  const effectiveTab = (!isSuperAdmin && adminTabKeys.includes(activeTab)) ? 'dashboard' : activeTab;
+
   const [establishments, setEstablishments] = useState<EstablishmentDTO[]>([
     {
       id: 'est-1',
-      establishmentCode: 'OR/BBS/6276',
+      establishmentCode: 'OR/BBS/0006276/000',
       name: 'M/s Jindal Stainless Steel Ltd',
       location: 'Danagadi, Jajpur',
       district: 'Jajpur',
@@ -43,7 +49,7 @@ export function App() {
     },
     {
       id: 'est-2',
-      establishmentCode: 'OR/BBS/1238',
+      establishmentCode: 'OR/BBS/0001238/000',
       name: 'M/s Bhimtanagar Sukinda Chromite Mines',
       location: 'Sukinda, Jajpur',
       district: 'Jajpur',
@@ -52,7 +58,7 @@ export function App() {
     },
     {
       id: 'est-3',
-      establishmentCode: 'OR/BBS/5077',
+      establishmentCode: 'OR/BBS/0005077/000',
       name: 'M/s NTPC Kanhia Thermal Power Plant',
       location: 'Kanhia, Angul',
       district: 'Angul',
@@ -61,7 +67,7 @@ export function App() {
     },
     {
       id: 'est-4',
-      establishmentCode: 'OR/BBS/16917/24',
+      establishmentCode: 'OR/BBS/0016917/024',
       name: 'M/s Executive Engineer, Mahanadi South Division',
       location: 'Cuttack',
       district: 'Cuttack',
@@ -75,7 +81,7 @@ export function App() {
       location: 'Choudwar Industrial Area, Cuttack',
       district: 'Cuttack',
       coverageStatus: 'COVERED',
-      industryType: 'Logistics & Warehousing',
+      industryType: 'Logistics & Supply Chain',
     },
   ]);
 
@@ -83,30 +89,16 @@ export function App() {
     {
       id: 'tour-1',
       officerId: currentUser.id,
-      title: 'Special Compliance Drive - Cuttack Industrial Zone',
-      purpose: 'Inspection of 14B damages defaults & un-enrolled contract worker verification.',
       month: 8,
       year: 2026,
+      title: 'Monsoon Compliance Drive & 7A Quasi-Judicial Inquiries',
+      purpose: 'Verification of 14B damages defaults & un-enrolled contract worker verification across Jajpur industrial cluster.',
       startDate: '2026-08-10',
-      endDate: '2026-08-14',
+      endDate: '2026-08-28',
       status: 'APPROVED',
-      remarks: 'Approved by APFC (Compliance)',
+      remarks: 'APFC approved for 8 major establishment visits',
       inspectionsCount: 4,
       createdAt: '2026-08-01',
-    },
-    {
-      id: 'tour-2',
-      officerId: currentUser.id,
-      title: 'Routine Inspection Tour - Choudwar Sector II',
-      purpose: 'Verification of coverage eligibility for newly registered establishments under Sec 1(3)(b).',
-      month: 8,
-      year: 2026,
-      startDate: '2026-08-20',
-      endDate: '2026-08-22',
-      status: 'SUBMITTED',
-      remarks: 'Submitted for APFC approval',
-      inspectionsCount: 2,
-      createdAt: '2026-08-05',
     },
   ]);
 
@@ -114,7 +106,7 @@ export function App() {
     {
       id: 'insp-1',
       tourId: 'tour-1',
-      date: '2026-08-11',
+      date: '2026-08-10',
       establishmentCode: 'OR/BBS/0045231/000',
       establishmentName: 'Apex Logistics & Freight India Pvt Ltd',
       location: 'Choudwar Industrial Area, Cuttack',
@@ -126,7 +118,7 @@ export function App() {
       id: 'insp-2',
       tourId: 'tour-1',
       date: '2026-08-12',
-      establishmentCode: 'OR/BBS/6276',
+      establishmentCode: 'OR/BBS/0006276/000',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
       location: 'Danagadi, Jajpur',
       inspectionPurpose: 'PMVBRY Campaigning & Verification',
@@ -139,7 +131,7 @@ export function App() {
     {
       id: 'claim-1',
       tourId: 'tour-1',
-      tourTitle: 'Special Compliance Drive - Andheri East Zone',
+      tourTitle: 'Special Compliance Drive - Jajpur Industrial Cluster',
       officerId: currentUser.id,
       totalAmount: 3450,
       taAmount: 1200,
@@ -210,8 +202,8 @@ export function App() {
   };
 
   return (
-    <Layout user={currentUser} activeTab={activeTab} setActiveTab={setActiveTab}>
-      {activeTab === 'dashboard' && (
+    <Layout user={currentUser} activeTab={effectiveTab} setActiveTab={setActiveTab}>
+      {effectiveTab === 'dashboard' && (
         <Dashboard
           user={currentUser}
           tours={tours}
@@ -220,27 +212,27 @@ export function App() {
           onNavigate={setActiveTab}
         />
       )}
-      {activeTab === 'analytics' && (
+      {effectiveTab === 'analytics' && (
         <AnalyticsDashboard
           establishments={establishments}
           tours={tours}
           inspections={inspections}
         />
       )}
-      {activeTab === 'tours' && (
+      {effectiveTab === 'tours' && (
         <TourPrograms tours={tours} onAddTour={handleAddTour} />
       )}
-      {activeTab === 'inspections' && (
+      {effectiveTab === 'inspections' && (
         <InspectionLogs
           inspections={inspections}
           tours={tours}
           onAddInspection={handleAddInspection}
         />
       )}
-      {activeTab === 'followups' && (
+      {effectiveTab === 'followups' && (
         <FollowUpTracker establishments={establishments} onNavigate={setActiveTab} />
       )}
-      {activeTab === 'establishments' && (
+      {effectiveTab === 'establishments' && (
         <Establishments
           establishments={establishments}
           inspections={inspections}
@@ -250,20 +242,32 @@ export function App() {
           onImportEstablishments={handleImportEstablishments}
         />
       )}
-      {activeTab === 'documents' && (
+      {effectiveTab === 'documents' && (
         <DocumentVault establishments={establishments} />
       )}
-      {activeTab === 'communication' && (
+      {effectiveTab === 'communication' && (
         <CommunicationHub establishments={establishments} />
       )}
-      {activeTab === 'claims' && (
+      {effectiveTab === 'claims' && (
         <Claims claims={claims} tours={tours} onAddClaim={handleAddClaim} />
       )}
-      {activeTab === 'reports' && (
+      {effectiveTab === 'reports' && (
         <Reports user={currentUser} tours={tours} inspections={inspections} claims={claims} />
       )}
-      {['users', 'roles', 'departments', 'districts', 'audit-logs', 'settings'].includes(activeTab) && (
-        <UserManagement currentUser={currentUser} tours={tours} />
+      {isSuperAdmin && adminTabKeys.includes(effectiveTab) && (
+        <UserManagement
+          currentUser={currentUser}
+          tours={tours}
+          initialSubTab={
+            effectiveTab === 'roles' ? 'roles' :
+            effectiveTab === 'offices' || effectiveTab === 'departments' || effectiveTab === 'districts' ? 'offices' :
+            effectiveTab === 'audit-logs' ? 'audit' :
+            effectiveTab === 'security' ? 'security' :
+            effectiveTab === 'backups' ? 'backups' :
+            effectiveTab === 'config' ? 'config' :
+            effectiveTab === 'settings' ? 'settings' : 'users'
+          }
+        />
       )}
     </Layout>
   );

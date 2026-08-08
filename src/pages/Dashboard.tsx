@@ -63,7 +63,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const pendingVisits = [
     {
       id: 'p-1',
-      code: 'OR/BBS/6019',
+      code: 'OR/BBS/0006019/000',
       name: 'M/S Bharat Security & Allied Services',
       location: 'Dist Office, Cuttack',
       reason: 'PMVBRY enrolment check & Form 11 notice',
@@ -71,7 +71,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     },
     {
       id: 'p-2',
-      code: 'OR/BBS/104724',
+      code: 'OR/BBS/0104724/000',
       name: 'M/S Magma Food Processors',
       location: 'CDA Sector 9, Cuttack',
       reason: 'Coverage eligibility verification under Sec 1(3)(b)',
@@ -93,7 +93,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     },
     {
       id: 'f-2',
-      establishmentCode: 'OR/BBS/6276',
+      establishmentCode: 'OR/BBS/0006276/000',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
       dueDate: '2026-08-18',
       type: '14B_DAMAGES',
@@ -196,7 +196,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       id: 'act-3',
       timestamp: '04 Aug',
       title: 'Section 14B Recovery Received',
-      description: 'Logged ₹1,25,000 demand payment from Jindal Stainless Steel (OR/BBS/6276).',
+      description: 'Logged ₹1,25,000 demand payment from Jindal Stainless Steel (OR/BBS/0006276/000).',
       category: 'RECOVERY',
       badgeColor: 'bg-emerald-600',
     },
@@ -229,9 +229,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
           refNumber: data.code || `REF-${Date.now()}`,
           uploadedAt: new Date().toISOString().split('T')[0],
           fileSize: '1.2 MB',
-          establishmentCode: 'OR/BBS/6276',
+          establishmentCode: 'OR/BBS/0006276/000',
           establishmentName: data.name,
-          folderPath: '/OR-BBS-6276/Inspection Reports/',
+          folderPath: '/OR-BBS-0006276-000/Inspection Reports/',
           fileFormat: 'PDF',
           currentVersion: 'v1.0',
           versions: [

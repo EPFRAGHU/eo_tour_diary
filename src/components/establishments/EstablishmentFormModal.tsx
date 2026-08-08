@@ -37,7 +37,7 @@ export const EstablishmentFormModal: React.FC<EstablishmentFormModalProps> = ({
       });
     } else {
       setFormData({
-        establishmentCode: 'OR/BBS/',
+        establishmentCode: 'OR/BBS/0000000/000',
         name: '',
         location: '',
         district: 'Cuttack',

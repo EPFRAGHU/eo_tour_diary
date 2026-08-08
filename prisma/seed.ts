@@ -96,7 +96,7 @@ async function main() {
   // 4. Sample Official Establishments Parsed from Excel
   const establishments = [
     {
-      establishmentCode: 'OR/BBS/6276',
+      establishmentCode: 'OR/BBS/0006276/000',
       name: 'M/s Jindal Stainless Steel Ltd',
       location: 'Danagadi, Jajpur',
       district: 'Jajpur',
@@ -104,7 +104,7 @@ async function main() {
       industryType: 'Manufacturing / Metallurgy',
     },
     {
-      establishmentCode: 'OR/BBS/1238',
+      establishmentCode: 'OR/BBS/0001238/000',
       name: 'M/s Bhimtanagar Sukinda Chromite Mines',
       location: 'Sukinda, Jajpur',
       district: 'Jajpur',
@@ -112,7 +112,7 @@ async function main() {
       industryType: 'Mining & Extraction',
     },
     {
-      establishmentCode: 'OR/BBS/5077',
+      establishmentCode: 'OR/BBS/0005077/000',
       name: 'M/s NTPC Kanhia Thermal Power Plant',
       location: 'Kanhia, Angul',
       district: 'Angul',
@@ -120,7 +120,7 @@ async function main() {
       industryType: 'Power Generation',
     },
     {
-      establishmentCode: 'OR/BBS/16917/24',
+      establishmentCode: 'OR/BBS/0016917/024',
       name: 'M/s Executive Engineer, Mahanadi South Division',
       location: 'Cuttack',
       district: 'Cuttack',
@@ -128,12 +128,12 @@ async function main() {
       industryType: 'Public Works / Irrigation',
     },
     {
-      establishmentCode: 'OR/BBS/888',
-      name: 'M/s TTPS Angul',
-      location: 'Angul',
-      district: 'Angul',
+      establishmentCode: 'OR/BBS/0045231/000',
+      name: 'Apex Logistics & Freight India Pvt Ltd',
+      location: 'Choudwar Industrial Area, Cuttack',
+      district: 'Cuttack',
       coverageStatus: 'COVERED' as const,
-      industryType: 'Thermal Power',
+      industryType: 'Logistics & Supply Chain',
     },
   ];
 

@@ -68,9 +68,9 @@ export const DocumentVault: React.FC<DocumentVaultProps> = ({ establishments }) 
       refNumber: 'IMG-20260802-WA0045',
       uploadedAt: '2026-08-02',
       fileSize: '3.4 MB',
-      establishmentCode: 'OR/BBS/6276',
+      establishmentCode: 'OR/BBS/0006276/000',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
-      folderPath: '/OR-BBS-6276/Site Photos/',
+      folderPath: '/OR-BBS-0006276-000/Site Photos/',
       fileFormat: 'PHOTO',
       currentVersion: 'v1.0',
       versions: [
@@ -91,9 +91,9 @@ export const DocumentVault: React.FC<DocumentVaultProps> = ({ establishments }) 
       refNumber: 'OR/DO/CTC/Audit/Excel/457',
       uploadedAt: '2026-08-04',
       fileSize: '420 KB',
-      establishmentCode: 'OR/BBS/1238',
+      establishmentCode: 'OR/BBS/0001238/000',
       establishmentName: 'M/s Bhimtanagar Sukinda Chromite Mines',
-      folderPath: '/OR-BBS-1238/7A Enquiry Docs/',
+      folderPath: '/OR-BBS-0001238-000/7A Enquiry Docs/',
       fileFormat: 'EXCEL',
       currentVersion: 'v1.1',
       versions: [

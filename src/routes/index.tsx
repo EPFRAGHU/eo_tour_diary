@@ -7,6 +7,7 @@ import { ForgotPassword } from '@/pages/auth/ForgotPassword';
 import { AccessDenied } from '@/pages/auth/AccessDenied';
 import { NotFound } from '@/pages/NotFound';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { SuperAdminRoute } from '@/components/auth/SuperAdminRoute';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -17,11 +18,109 @@ export const AppRoutes: React.FC = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/access-denied" element={<AccessDenied />} />
 
+        {/* Super Admin Direct Protected URL Routes */}
+        <Route
+          path="/admin"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="users" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="users" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/roles"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="roles" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/permissions"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="roles" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/offices"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="offices" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/departments"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="departments" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/districts"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="districts" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="settings" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/audit-logs"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="audit-logs" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/security"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="security" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/backups"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="backups" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/config"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="config" />
+            </SuperAdminRoute>
+          }
+        />
+
         {/* Protected Application Shell Route */}
         <Route
           path="/*"
           element={
-            <ProtectedRoute allowedRoles={['ADMIN', 'APFC', 'EO', 'EO_AO', 'VIEWER']}>
+            <ProtectedRoute>
               <App />
             </ProtectedRoute>
           }
@@ -31,3 +130,4 @@ export const AppRoutes: React.FC = () => {
     </BrowserRouter>
   );
 };
+

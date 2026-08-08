@@ -18,7 +18,7 @@ export const FollowUpModal: React.FC<FollowUpModalProps> = ({
   onSave,
 }) => {
   const [formData, setFormData] = useState({
-    establishmentCode: establishments[0]?.establishmentCode || 'OR/BBS/6276',
+    establishmentCode: establishments[0]?.establishmentCode || 'OR/BBS/0006276/000',
     establishmentName: establishments[0]?.name || 'M/s Jindal Stainless Steel Ltd',
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     nextVisitDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -42,7 +42,7 @@ export const FollowUpModal: React.FC<FollowUpModalProps> = ({
       });
     } else {
       setFormData({
-        establishmentCode: establishments[0]?.establishmentCode || 'OR/BBS/6276',
+        establishmentCode: establishments[0]?.establishmentCode || 'OR/BBS/0006276/000',
         establishmentName: establishments[0]?.name || 'M/s Jindal Stainless Steel Ltd',
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         nextVisitDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],

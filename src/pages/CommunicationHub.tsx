@@ -35,7 +35,7 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = () => {
     },
     {
       id: 'cnt-2',
-      establishmentCode: 'OR/BBS/6276',
+      establishmentCode: 'OR/BBS/0006276/000',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
       contactPerson: 'Shri R.K. Jena',
       designation: 'General Manager (Personnel)',
@@ -44,7 +44,7 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = () => {
     },
     {
       id: 'cnt-3',
-      establishmentCode: 'OR/BBS/1238',
+      establishmentCode: 'OR/BBS/0001238/000',
       name: 'M/s Bhimtanagar Sukinda Chromite Mines',
       establishmentName: 'M/s Bhimtanagar Sukinda Chromite Mines',
       contactPerson: 'Shri M. Swain',
@@ -54,7 +54,7 @@ export const CommunicationHub: React.FC<CommunicationHubProps> = () => {
     },
     {
       id: 'cnt-4',
-      establishmentCode: 'OR/BBS/5077',
+      establishmentCode: 'OR/BBS/0005077/000',
       establishmentName: 'M/s NTPC Kanhia Thermal Power Plant',
       contactPerson: 'Shri S.K. Mohanty',
       designation: 'DGM (HR & Compliance)',

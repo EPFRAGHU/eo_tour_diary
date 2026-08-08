@@ -41,7 +41,7 @@ export const TourDiaryFormBuilder: React.FC<TourDiaryFormBuilderProps> = ({
         visitDate: new Date().toISOString().split('T')[0],
         dayType: 'TOUR_DAY',
         establishmentName: 'M/s Jindal Stainless Steel Ltd',
-        establishmentCode: 'OR/BBS/6276',
+        establishmentCode: 'OR/BBS/0006276/000',
         location: 'Danagadi, Jajpur',
         durationDays: 1,
         purpose: 'PMVBRY campaigning & 14B damages check',

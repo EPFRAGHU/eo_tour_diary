@@ -19,7 +19,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     title: '',
     category: 'INSPECTION_NOTE' as DocumentRecord['category'],
     refNumber: `OR/DO/CTC/Compliance/${new Date().getFullYear()}/${Math.floor(100 + Math.random() * 900)}`,
-    establishmentCode: establishments[0]?.establishmentCode || 'OR/BBS/6276',
+    establishmentCode: establishments[0]?.establishmentCode || 'OR/BBS/0006276/000',
     fileFormat: 'PDF' as FileFormatType,
     fileName: '',
     fileSize: '1.5 MB',

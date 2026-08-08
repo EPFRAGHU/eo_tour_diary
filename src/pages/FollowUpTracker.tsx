@@ -40,7 +40,7 @@ export const FollowUpTracker: React.FC<FollowUpTrackerProps> = ({ establishments
     },
     {
       id: 'f-2',
-      establishmentCode: 'OR/BBS/6276',
+      establishmentCode: 'OR/BBS/0006276/000',
       establishmentName: 'M/s Jindal Stainless Steel Ltd',
       dueDate: '2026-08-18',
       nextVisitDate: '2026-08-22',
@@ -51,7 +51,7 @@ export const FollowUpTracker: React.FC<FollowUpTrackerProps> = ({ establishments
     },
     {
       id: 'f-3',
-      establishmentCode: 'OR/BBS/1238',
+      establishmentCode: 'OR/BBS/0001238/000',
       establishmentName: 'M/s Bhimtanagar Sukinda Chromite Mines',
       dueDate: '2026-08-10',
       nextVisitDate: '2026-08-15',
@@ -62,7 +62,7 @@ export const FollowUpTracker: React.FC<FollowUpTrackerProps> = ({ establishments
     },
     {
       id: 'f-4',
-      establishmentCode: 'OR/BBS/5077',
+      establishmentCode: 'OR/BBS/0005077/000',
       establishmentName: 'M/s NTPC Kanhia Thermal Power Plant',
       dueDate: '2026-08-01',
       nextVisitDate: '2026-08-05',

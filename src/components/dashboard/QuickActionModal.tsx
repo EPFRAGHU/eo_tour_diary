@@ -60,7 +60,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. OR/BBS/6276 M/s Jindal Stainless Steel"
+                  placeholder="e.g. OR/BBS/0006276/000 M/s Jindal Stainless Steel"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl bg-background border border-border focus:ring-2 focus:ring-epfo-accent outline-none"
