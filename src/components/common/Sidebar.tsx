@@ -56,6 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ user: propUser, activeTab, set
     { id: 'users', label: 'User Management', icon: Users, badge: 'Users' },
     { id: 'roles', label: 'Roles & Permissions', icon: Key, badge: 'RBAC' },
     { id: 'offices', label: 'Office Management', icon: Building, badge: null },
+    { id: 'establishment-import', label: 'Est. Master Import', icon: Database, badge: 'CSV' },
     { id: 'settings', label: 'System Settings', icon: Settings, badge: null },
     { id: 'audit-logs', label: 'Audit Logs', icon: FileText, badge: 'Audit' },
     { id: 'security', label: 'Security Settings', icon: Lock, badge: '2FA' },

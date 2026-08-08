@@ -60,6 +60,22 @@ export const AppRoutes: React.FC = () => {
           }
         />
         <Route
+          path="/admin/establishment-import"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="establishment-import" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/establishments-import"
+          element={
+            <SuperAdminRoute>
+              <App initialTab="establishment-import" />
+            </SuperAdminRoute>
+          }
+        />
+        <Route
           path="/admin/departments"
           element={
             <SuperAdminRoute>

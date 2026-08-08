@@ -34,21 +34,46 @@ import { PasswordManagementModal } from '@/components/admin/PasswordManagementMo
 import { LoginSecurityModal } from '@/components/admin/LoginSecurityModal';
 import { RolesPermissionsView } from '@/components/admin/RolesPermissionsView';
 import { AuditLogsView } from '@/components/admin/AuditLogsView';
+import { EstablishmentMasterImportView } from '@/components/admin/EstablishmentMasterImportView';
+import { EstablishmentDTO } from '@/types';
+
+export type SuperAdminSubTab =
+  | 'users'
+  | 'roles'
+  | 'offices'
+  | 'establishment-import'
+  | 'departments'
+  | 'districts'
+  | 'audit'
+  | 'settings'
+  | 'security'
+  | 'backups'
+  | 'config';
 
 interface UserManagementProps {
   currentUser: ExtendedUserProfile | any;
   tours?: TourProgramItem[];
   documents?: DocumentRecord[];
-  initialSubTab?: 'users' | 'roles' | 'offices' | 'departments' | 'districts' | 'audit' | 'settings' | 'security' | 'backups' | 'config';
+  establishments?: EstablishmentDTO[];
+  onImportEstablishments?: (imported: Omit<EstablishmentDTO, 'id'>[]) => void;
+  onAddEstablishment?: (est: Omit<EstablishmentDTO, 'id'>) => void;
+  onUpdateEstablishment?: (est: EstablishmentDTO) => void;
+  onDeleteEstablishment?: (id: string) => void;
+  initialSubTab?: SuperAdminSubTab;
 }
 
 export const UserManagement: React.FC<UserManagementProps> = ({
   currentUser,
   tours = [],
   documents = [],
+  establishments = [],
+  onImportEstablishments = () => {},
+  onAddEstablishment,
+  onUpdateEstablishment,
+  onDeleteEstablishment,
   initialSubTab = 'users',
 }) => {
-  const [subTab, setSubTab] = useState<'users' | 'roles' | 'offices' | 'departments' | 'districts' | 'audit' | 'settings' | 'security' | 'backups' | 'config'>(initialSubTab);
+  const [subTab, setSubTab] = useState<SuperAdminSubTab>(initialSubTab);
   const [users, setUsers] = useState<ExtendedUserProfile[]>([]);
   const [rbacMatrix, setRbacMatrix] = useState<RolePermissionsMap>(getRBACMatrixFromStorage());
   const [sessions, setSessions] = useState(getSessionsFromStorage());
@@ -423,17 +448,18 @@ export const UserManagement: React.FC<UserManagementProps> = ({
         )}
       </div>
 
-      {/* Navigation Sub-Menu Bar - All 8 Administration Modules */}
+      {/* Navigation Sub-Menu Bar - Super Admin Administration Modules */}
       <div className="flex border-b border-border bg-card p-1.5 gap-1.5 overflow-x-auto rounded-2xl shadow-sm">
         {[
           { id: 'users', label: '1. User Management', icon: Users, badge: users.length },
           { id: 'roles', label: '2. Roles & Permissions', icon: Key },
           { id: 'offices', label: '3. Office Management', icon: Building, badge: 'Offices' },
-          { id: 'settings', label: '4. System Settings', icon: Settings },
-          { id: 'audit', label: '5. Audit Logs', icon: FileText, badge: activityLogs.length },
-          { id: 'security', label: '6. Security Settings', icon: Lock, badge: '2FA' },
-          { id: 'backups', label: '7. Backup & Restore', icon: Database, badge: backupHistory.length },
-          { id: 'config', label: '8. Application Configuration', icon: Sliders },
+          { id: 'establishment-import', label: '4. Establishment Master Import', icon: Database, badge: `${establishments.length}` },
+          { id: 'settings', label: '5. System Settings', icon: Settings },
+          { id: 'audit', label: '6. Audit Logs', icon: FileText, badge: activityLogs.length },
+          { id: 'security', label: '7. Security Settings', icon: Lock, badge: '2FA' },
+          { id: 'backups', label: '8. Backup & Restore', icon: Database, badge: backupHistory.length },
+          { id: 'config', label: '9. Application Configuration', icon: Sliders },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = subTab === tab.id;
@@ -526,6 +552,18 @@ export const UserManagement: React.FC<UserManagementProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* 4. Establishment Master Import View */}
+      {subTab === 'establishment-import' && (
+        <EstablishmentMasterImportView
+          establishments={establishments}
+          onImportEstablishments={onImportEstablishments}
+          onAddEstablishment={onAddEstablishment}
+          onUpdateEstablishment={onUpdateEstablishment}
+          onDeleteEstablishment={onDeleteEstablishment}
+          currentUser={currentUser}
+        />
       )}
 
       {/* 4. System Settings View */}

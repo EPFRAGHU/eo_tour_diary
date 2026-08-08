@@ -32,7 +32,20 @@ export function App({ initialTab }: { initialTab?: string }) {
   };
 
   const isSuperAdmin = isProtectedSuperAdmin(currentUser);
-  const adminTabKeys = ['users', 'roles', 'offices', 'departments', 'districts', 'audit-logs', 'settings', 'security', 'backups', 'config'];
+  const adminTabKeys = [
+    'users',
+    'roles',
+    'offices',
+    'establishment-import',
+    'establishments-import',
+    'departments',
+    'districts',
+    'audit-logs',
+    'settings',
+    'security',
+    'backups',
+    'config',
+  ];
 
   // Guard activeTab if non-super admin attempts to view an admin tab
   const effectiveTab = (!isSuperAdmin && adminTabKeys.includes(activeTab)) ? 'dashboard' : activeTab;
@@ -258,9 +271,15 @@ export function App({ initialTab }: { initialTab?: string }) {
         <UserManagement
           currentUser={currentUser}
           tours={tours}
+          establishments={establishments}
+          onImportEstablishments={handleImportEstablishments}
+          onAddEstablishment={handleAddEstablishment}
+          onUpdateEstablishment={handleUpdateEstablishment}
+          onDeleteEstablishment={handleDeleteEstablishment}
           initialSubTab={
             effectiveTab === 'roles' ? 'roles' :
             effectiveTab === 'offices' || effectiveTab === 'departments' || effectiveTab === 'districts' ? 'offices' :
+            effectiveTab === 'establishment-import' || effectiveTab === 'establishments-import' ? 'establishment-import' :
             effectiveTab === 'audit-logs' ? 'audit' :
             effectiveTab === 'security' ? 'security' :
             effectiveTab === 'backups' ? 'backups' :
